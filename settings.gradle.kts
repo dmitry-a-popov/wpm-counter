@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Words Per Minute Counter"
 include(":app")
- 
+include(":core:analytics:api")
+include(":core:analytics:impl")
+include(":core:user:api")
+include(":core:user:impl")
