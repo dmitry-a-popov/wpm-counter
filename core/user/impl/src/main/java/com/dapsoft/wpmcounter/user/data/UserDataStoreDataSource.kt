@@ -1,4 +1,4 @@
-package com.dapsoft.wpmcounter.user
+package com.dapsoft.wpmcounter.user.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -21,8 +21,8 @@ internal class UserDataStoreDataSource @Inject constructor(
 ) {
     private val dataStore = context.userPreferences
 
-    val userNameFlow: Flow<String?> = dataStore.data.map {
-        it[Keys.USER_NAME]
+    val userNameFlow: Flow<String> = dataStore.data.map {
+        it[Keys.USER_NAME] ?: ""
     }
 
     suspend fun saveUserName(name: String) {

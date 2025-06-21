@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -37,6 +39,14 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:analytics:api"))
+    implementation(project(":core:analytics:impl"))
+    implementation(project(":core:user:api"))
+    implementation(project(":core:user:impl"))
+    implementation(project(":feature:login:api"))
+    implementation(project(":feature:login:impl"))
+    implementation(project(":feature:typing:api"))
+    implementation(project(":feature:typing:impl"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -46,7 +56,13 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    implementation(libs.navigation.compose)
+    ksp(libs.hilt.android.compiler)
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
