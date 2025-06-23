@@ -90,8 +90,8 @@ internal fun TypingScreen(
                 }
                 .onKeyEvent {
                     when (it.type) {
-                        KeyEventType.KeyUp -> false//vm.processIntent(UiIntent.KeyUp(it.key))
-                        KeyEventType.KeyDown -> false//vm.processIntent(UiIntent.KeyDown(it.key))
+                        KeyEventType.KeyUp -> vm.processIntent(UiIntent.KeyRelease(it.nativeKeyEvent.keyCode, it.nativeKeyEvent.eventTime))
+                        KeyEventType.KeyDown -> vm.processIntent(UiIntent.KeyPress(it.nativeKeyEvent.keyCode, it.nativeKeyEvent.eventTime))
                     }
                     false
                 }

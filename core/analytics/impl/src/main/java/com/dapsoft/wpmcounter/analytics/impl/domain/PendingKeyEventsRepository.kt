@@ -6,5 +6,5 @@ internal interface PendingKeyEventsRepository {
 
     fun savePendingKeyEvent(pendingEvent: KeyEvent)
 
-    fun getAndRemovePendingKeyEvent(keyCode: Char): KeyEvent?
+    fun getAndRemovePendingKeyEvent(keyCode: Int): KeyEvent?
 }

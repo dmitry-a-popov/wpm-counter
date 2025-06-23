@@ -1,10 +1,10 @@
 package com.dapsoft.wpmcounter.typing.presentation
 
 import androidx.lifecycle.viewModelScope
+
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyReleaseUseCase
-
 import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
 import com.dapsoft.wpmcounter.typing.ui.MistakesMarker
@@ -77,8 +77,18 @@ internal class TypingViewModel @Inject constructor(
             }
 
             UiIntent.Restart -> clearState()
-            is UiIntent.KeyPress -> trackKeyPressUseCase(keyCode = intent.key, phoneOrientation = 0, _uiState.value.userName)
-            is UiIntent.KeyRelease -> trackKeyReleaseUseCase(keyCode = intent.key, phoneOrientation = 0, _uiState.value.userName)
+            is UiIntent.KeyPress -> trackKeyPressUseCase(
+                keyCode = intent.keyCode,
+                eventTimeMillis = intent.eventTime,
+                phoneOrientation = 0,
+                _uiState.value.userName
+            )
+            is UiIntent.KeyRelease -> trackKeyReleaseUseCase(
+                keyCode = intent.keyCode,
+                eventTimeMillis = intent.eventTime,
+                phoneOrientation = 0,
+                _uiState.value.userName
+            )
         }
     }
 

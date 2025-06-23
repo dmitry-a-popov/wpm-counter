@@ -2,6 +2,7 @@ package com.dapsoft.wpmcounter.analytics.impl.di
 
 import android.content.Context
 import androidx.room.Room
+
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyReleaseUseCase
@@ -14,7 +15,6 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.PendingKeyEventsRepository
 import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyReleaseUseCaseImpl
-import com.dapsoft.wpmcounter.common.TimeProvider
 
 import dagger.Module
 import dagger.Provides
@@ -60,22 +60,19 @@ object AnalyticsModule {
 
     @Provides
     internal fun provideTrackKeyPressUseCase(
-        pendingKeyEventsRepository: PendingKeyEventsRepository,
-        timeProvider: TimeProvider
+        pendingKeyEventsRepository: PendingKeyEventsRepository
     ): TrackKeyPressUseCase {
-        return TrackKeyPressUseCaseImpl(pendingKeyEventsRepository, timeProvider)
+        return TrackKeyPressUseCaseImpl(pendingKeyEventsRepository)
     }
 
     @Provides
     internal fun provideTrackKeyReleaseUseCase(
         pendingKeyEventsRepository: PendingKeyEventsRepository,
-        behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
-        timeProvider: TimeProvider
+        behavioralAnalyticsRepository: BehavioralAnalyticsRepository
     ) : TrackKeyReleaseUseCase {
         return TrackKeyReleaseUseCaseImpl(
             pendingKeyEventsRepository,
-            behavioralAnalyticsRepository,
-            timeProvider
+            behavioralAnalyticsRepository
         )
     }
 }

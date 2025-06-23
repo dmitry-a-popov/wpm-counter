@@ -5,14 +5,12 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeyEvent
 import com.dapsoft.wpmcounter.common.TimeProvider
 
 internal class TrackKeyPressUseCaseImpl(
-    private val pendingKeyEventsRepository: PendingKeyEventsRepository,
-    private val timeProvider: TimeProvider
+    private val pendingKeyEventsRepository: PendingKeyEventsRepository
 ) : TrackKeyPressUseCase {
 
-    override fun invoke(keyCode: Char, phoneOrientation: Int, username: String) {
-        val currentTimeMillis = timeProvider.getElapsedRealtime()
+    override fun invoke(keyCode: Int, eventTimeMillis: Long, phoneOrientation: Int, username: String) {
         val pendingKeyEvent = KeyEvent(
-            keyPressTime = currentTimeMillis,
+            keyPressTime = eventTimeMillis,
             keyReleaseTime = 0,
             keyCode = keyCode,
             phoneOrientation = phoneOrientation,
