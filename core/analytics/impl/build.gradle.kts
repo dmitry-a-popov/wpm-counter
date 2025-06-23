@@ -30,6 +30,10 @@ android {
     }
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(project(":core:analytics:api"))
     implementation(project(":core:common:api"))
