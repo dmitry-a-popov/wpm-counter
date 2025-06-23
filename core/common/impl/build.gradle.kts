@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.dapsoft.wpmcounter.analytics.impl"
+    namespace = "com.dapsoft.wpmcounter.common.impl"
     compileSdk = 35
 
     defaultConfig {
@@ -31,16 +30,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:analytics:api"))
     implementation(project(":core:common:api"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.room.runtime)
     implementation(libs.hilt.android)
-
-    ksp(libs.androidx.room.compiler)
-    ksp(libs.hilt.android.compiler)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

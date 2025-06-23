@@ -1,6 +1,9 @@
 package com.dapsoft.wpmcounter.typing.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
+import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
+import com.dapsoft.wpmcounter.analytics.TrackKeyReleaseUseCase
 
 import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
@@ -24,6 +27,9 @@ internal class TypingViewModel @Inject constructor(
     private val saveUserNameUseCase: SaveUserNameUseCase,
     private val getSampleTextUseCase: GetSampleTextUseCase,
     private val getMistakeIndicesUseCase: GetMistakeIndicesUseCase,
+    private val clearEventsUseCase: ClearEventsUseCase,
+    private val trackKeyPressUseCase: TrackKeyPressUseCase,
+    private val trackKeyReleaseUseCase: TrackKeyReleaseUseCase,
     val mistakesMarker: MistakesMarker
 ) : BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(
     UiState(
@@ -71,13 +77,16 @@ internal class TypingViewModel @Inject constructor(
             }
 
             UiIntent.Restart -> clearState()
+            is UiIntent.KeyPress -> trackKeyPressUseCase(keyCode = intent.key, phoneOrientation = 0, _uiState.value.userName)
+            is UiIntent.KeyRelease -> trackKeyReleaseUseCase(keyCode = intent.key, phoneOrientation = 0, _uiState.value.userName)
         }
     }
 
     //TODO mark isFinished as true
     //TODO mark isInputDisabled as true
 
-    private fun clearState() {
+    private suspend fun clearState() {
+        clearEventsUseCase()
         _uiState.value = _uiState.value.copy(
             typedText = "",
             mistakeIndices = emptyList(),
@@ -86,7 +95,8 @@ internal class TypingViewModel @Inject constructor(
     }
 
     private suspend fun changeUser() {
-        saveUserNameUseCase.invoke("")
+        clearState()
+        saveUserNameUseCase("")
         _oneTimeEvent.emit(OneTimeEvent.LeaveScreen)
     }
 }
