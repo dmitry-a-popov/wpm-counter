@@ -5,4 +5,6 @@ sealed class UiIntent {
     data class ChangeTypedText(val text: String) : UiIntent()
 
     object ChangeUser: UiIntent()
+
+    object Restart: UiIntent()
 }

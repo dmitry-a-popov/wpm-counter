@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -18,19 +19,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import com.dapsoft.wpmcounter.typing.presentation.TypingViewModel
-import kotlin.comparisons.then
-
-import kotlin.math.roundToInt
 
 @Composable
 internal fun TypingScreen(
@@ -52,10 +57,9 @@ internal fun TypingScreen(
 
     Column(Modifier.padding(16.dp)) {
         Text(
-            text = "Speed (WPM): ${uiState.wordsPerMinute}",
+            text = "Speed (WPM): ${uiState.wordsPerMinute}${if (uiState.isCalculationPaused) "PAUSED" else ""}",
             modifier = Modifier.fillMaxWidth(),
-            fontSize = 24.sp,
-            textAlign = TextAlign.Center
+            fontSize = 24.sp
         )
         Spacer(Modifier.height(16.dp))
         Text("Hello, ${uiState.userName}, please type the following text:")
@@ -64,18 +68,35 @@ internal fun TypingScreen(
         Spacer(Modifier.height(16.dp))
         BasicTextField(
             value = uiState.typedText,
-            onValueChange = { vm.processIntent(UiIntent.ChangeTypedText(it)) },
+            onValueChange = { newValue ->
+                vm.processIntent(UiIntent.ChangeTypedText(newValue))
+            },
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Password
+            ),
+            visualTransformation = VisualTransformation {
+                TransformedText(
+                    vm.mistakesMarker.mark(uiState.typedText, uiState.mistakeIndices),
+                    OffsetMapping.Identity
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(180.dp)
+                .onPreviewKeyEvent {
+                    it.type == KeyEventType.KeyDown && it.key == Key.Backspace
+                }
                 .onKeyEvent {
-                    if (it.type == KeyEventType.KeyUp &&
-                        it.key != Key.Backspace
-                    ) {
-
+                    when (it.type) {
+                        KeyEventType.KeyUp -> false//vm.processIntent(UiIntent.KeyUp(it.key))
+                        KeyEventType.KeyDown -> false//vm.processIntent(UiIntent.KeyDown(it.key))
                     }
-                    true
-                },
+                    false
+                }
+                .alpha(if (uiState.isInputDisabled) 0.6f else 1f),
+            enabled = !uiState.isInputDisabled,
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier
@@ -97,7 +118,9 @@ internal fun TypingScreen(
                 }
             }
         )
-        Spacer(Modifier.height(8.dp))
-        Button(onClick = onChangeUser) { Text("Change user") }
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = { vm.processIntent(UiIntent.ChangeUser) } ) { Text("Change user") }
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = { vm.processIntent(UiIntent.Restart) } ) { Text("Restart") }
     }
 }
