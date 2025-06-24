@@ -36,6 +36,8 @@ android {
 
 dependencies {
     implementation(project(":core:analytics:api"))
+    implementation(project(":core:common:api"))
+    implementation(project(":core:logger:api"))
     implementation(project(":core:ui-common"))
     implementation(project(":core:user:api"))
     implementation(project(":feature:typing:api"))

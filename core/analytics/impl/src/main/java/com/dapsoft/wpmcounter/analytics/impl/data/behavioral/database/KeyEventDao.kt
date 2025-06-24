@@ -1,4 +1,4 @@
-package com.dapsoft.wpmcounter.analytics.impl.data.database
+package com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database
 
 import androidx.room.Dao
 import androidx.room.Insert

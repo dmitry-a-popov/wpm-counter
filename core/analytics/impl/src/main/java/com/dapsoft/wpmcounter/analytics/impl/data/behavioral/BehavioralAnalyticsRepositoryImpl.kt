@@ -1,8 +1,9 @@
-package com.dapsoft.wpmcounter.analytics.impl.data
+package com.dapsoft.wpmcounter.analytics.impl.data.behavioral
 
-import com.dapsoft.wpmcounter.analytics.impl.data.database.KeyEventEntity
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeyEventEntity
 import com.dapsoft.wpmcounter.analytics.impl.domain.BehavioralAnalyticsRepository
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeyEvent
+
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

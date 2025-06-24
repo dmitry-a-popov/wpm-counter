@@ -43,6 +43,8 @@ dependencies {
     implementation(project(":core:analytics:impl"))
     implementation(project(":core:common:api"))
     implementation(project(":core:common:impl"))
+    implementation(project(":core:logger:api"))
+    implementation(project(":core:logger:impl"))
     implementation(project(":core:user:api"))
     implementation(project(":core:user:impl"))
     implementation(project(":feature:login:api"))

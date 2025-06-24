@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:logger:api"))
     implementation(project(":core:ui-common"))
     implementation(project(":core:user:api"))
     implementation(project(":feature:login:api"))

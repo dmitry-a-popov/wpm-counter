@@ -1,5 +1,6 @@
 package com.dapsoft.wpmcounter.typing.ui
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,17 +22,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onInterceptKeyBeforeSoftKeyboard
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreInterceptKeyBeforeSoftKeyboard
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -55,6 +58,11 @@ internal fun TypingScreen(
 
     val uiState = vm.uiState.collectAsState().value
 
+    val textFieldValue = TextFieldValue(
+        text = uiState.typedText,
+        selection = TextRange(uiState.typedText.length)
+    )
+
     Column(Modifier.padding(16.dp)) {
         Text(
             text = "Speed (WPM): ${uiState.wordsPerMinute}${if (uiState.isCalculationPaused) "PAUSED" else ""}",
@@ -67,9 +75,13 @@ internal fun TypingScreen(
         Text(uiState.sampleText)
         Spacer(Modifier.height(16.dp))
         BasicTextField(
-            value = uiState.typedText,
+            value = textFieldValue,
             onValueChange = { newValue ->
-                vm.processIntent(UiIntent.ChangeTypedText(newValue))
+                val forcedEndCursor = TextFieldValue(
+                    text = newValue.text,
+                    selection = TextRange(newValue.text.length)
+                )
+                vm.processIntent(UiIntent.ChangeTypedText(forcedEndCursor.text))
             },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -86,14 +98,7 @@ internal fun TypingScreen(
                 .fillMaxWidth()
                 .height(180.dp)
                 .onPreviewKeyEvent {
-                    it.type == KeyEventType.KeyDown && it.key == Key.Backspace
-                }
-                .onKeyEvent {
-                    when (it.type) {
-                        KeyEventType.KeyUp -> vm.processIntent(UiIntent.KeyRelease(it.nativeKeyEvent.keyCode, it.nativeKeyEvent.eventTime))
-                        KeyEventType.KeyDown -> vm.processIntent(UiIntent.KeyPress(it.nativeKeyEvent.keyCode, it.nativeKeyEvent.eventTime))
-                    }
-                    false
+                    it.key == Key.Backspace
                 }
                 .alpha(if (uiState.isInputDisabled) 0.6f else 1f),
             enabled = !uiState.isInputDisabled,

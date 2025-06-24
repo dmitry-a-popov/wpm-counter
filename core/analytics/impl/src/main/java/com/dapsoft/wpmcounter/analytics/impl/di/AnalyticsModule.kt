@@ -1,20 +1,22 @@
 package com.dapsoft.wpmcounter.analytics.impl.di
 
 import android.content.Context
+
 import androidx.room.Room
 
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
+import com.dapsoft.wpmcounter.analytics.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
-import com.dapsoft.wpmcounter.analytics.TrackKeyReleaseUseCase
-import com.dapsoft.wpmcounter.analytics.impl.data.BehavioralAnalyticsDatabaseDataSource
-import com.dapsoft.wpmcounter.analytics.impl.data.BehavioralAnalyticsRepositoryImpl
-import com.dapsoft.wpmcounter.analytics.impl.data.PendingKeyEventsRepositoryImpl
-import com.dapsoft.wpmcounter.analytics.impl.data.database.AnalyticsDatabase
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDatabaseDataSource
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsRepositoryImpl
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.AnalyticsDatabase
+import com.dapsoft.wpmcounter.analytics.impl.data.TypingSpeedRepositoryImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.BehavioralAnalyticsRepository
 import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventUseCaseImpl
-import com.dapsoft.wpmcounter.analytics.impl.domain.PendingKeyEventsRepository
+import com.dapsoft.wpmcounter.analytics.impl.domain.GetTypingSpeedUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
-import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyReleaseUseCaseImpl
+import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSpeedRepository
+import com.dapsoft.wpmcounter.logger.Logger
 
 import dagger.Module
 import dagger.Provides
@@ -46,12 +48,6 @@ object AnalyticsModule {
     }
 
     @Provides
-    @Singleton
-    internal fun providePendingKeyEventsRepository(): PendingKeyEventsRepository {
-        return PendingKeyEventsRepositoryImpl()
-    }
-
-    @Provides
     internal fun provideClearEventsUseCase(
         behavioralAnalyticsRepository: BehavioralAnalyticsRepository
     ): ClearEventsUseCase {
@@ -60,19 +56,23 @@ object AnalyticsModule {
 
     @Provides
     internal fun provideTrackKeyPressUseCase(
-        pendingKeyEventsRepository: PendingKeyEventsRepository
+        behavioralAnalyticsRepository: BehavioralAnalyticsRepository
     ): TrackKeyPressUseCase {
-        return TrackKeyPressUseCaseImpl(pendingKeyEventsRepository)
+        return TrackKeyPressUseCaseImpl(behavioralAnalyticsRepository)
     }
 
     @Provides
-    internal fun provideTrackKeyReleaseUseCase(
-        pendingKeyEventsRepository: PendingKeyEventsRepository,
-        behavioralAnalyticsRepository: BehavioralAnalyticsRepository
-    ) : TrackKeyReleaseUseCase {
-        return TrackKeyReleaseUseCaseImpl(
-            pendingKeyEventsRepository,
-            behavioralAnalyticsRepository
-        )
+    @Singleton
+    internal fun provideWordsRepository() : TypingSpeedRepository {
+        return TypingSpeedRepositoryImpl()
+    }
+
+    @Provides
+    internal fun provideGetTypingSpeedUseCase(
+        analyticsRepository: BehavioralAnalyticsRepository,
+        typingSpeedRepository: TypingSpeedRepository,
+        log: Logger
+    ): GetTypingSpeedUseCase {
+        return GetTypingSpeedUseCaseImpl(analyticsRepository, typingSpeedRepository, log)
     }
 }

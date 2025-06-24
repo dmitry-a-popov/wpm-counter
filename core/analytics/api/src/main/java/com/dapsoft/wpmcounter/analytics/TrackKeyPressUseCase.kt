@@ -1,6 +1,13 @@
 package com.dapsoft.wpmcounter.analytics
 
+import com.dapsoft.wpmcounter.common.screenorientation.ScreenOrientation
+
 interface TrackKeyPressUseCase {
 
-    operator fun invoke(keyCode: Int, eventTimeMillis: Long, phoneOrientation: Int, username: String)
+    suspend operator fun invoke(
+        keyCode: Char,
+        eventTimeMillis: Long,
+        phoneOrientation: ScreenOrientation,
+        username: String
+    )
 }
