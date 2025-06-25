@@ -3,15 +3,18 @@ package com.dapsoft.wpmcounter.typing.presentation
 import androidx.lifecycle.viewModelScope
 
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
-import com.dapsoft.wpmcounter.analytics.GetTypingSpeedUseCase
+import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.common.TimeProvider
-import com.dapsoft.wpmcounter.common.screenorientation.ScreenOrientationProvider
+import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
+import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.logger.Logger
+import com.dapsoft.wpmcounter.typing.domain.CountWordUseCase
+import com.dapsoft.wpmcounter.typing.domain.GetCurrentWordIndicesUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
-import com.dapsoft.wpmcounter.typing.domain.InputTextValidator
-import com.dapsoft.wpmcounter.typing.ui.MistakesMarker
+import com.dapsoft.wpmcounter.typing.ui.InputState
+import com.dapsoft.wpmcounter.typing.ui.TextMarker
 import com.dapsoft.wpmcounter.typing.ui.OneTimeEvent
 import com.dapsoft.wpmcounter.typing.ui.UiIntent
 import com.dapsoft.wpmcounter.typing.ui.UiState
@@ -21,12 +24,6 @@ import com.dapsoft.wpmcounter.user.SaveUserNameUseCase
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 import javax.inject.Inject
@@ -40,19 +37,22 @@ internal class TypingViewModel @Inject constructor(
     private val clearEventsUseCase: ClearEventsUseCase,
     private val trackKeyPressUseCase: TrackKeyPressUseCase,
     private val getTypingSpeedUseCase: GetTypingSpeedUseCase,
+    private val getCurrentWordIndicesUseCase: GetCurrentWordIndicesUseCase,
     private val screenOrientationProvider: ScreenOrientationProvider,
+    private val countWordUseCase: CountWordUseCase,
     private val timeProvider: TimeProvider,
-    val mistakesMarker: MistakesMarker,
+    private val wordValidator: WordValidator,
+    val textMarker: TextMarker,
     val log: Logger
 ) : BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(
     UiState(
         userName = "",
         sampleText = "",
+        currentWordIndices = Pair(0, 0),
         typedText = "",
         mistakeIndices = emptyList(),
         wordsPerMinute = 0F,
-        isInputDisabled = false,
-        isCalculationPaused = false
+        inputState = InputState.ACTIVE
     )
 ) {
 
@@ -71,16 +71,21 @@ internal class TypingViewModel @Inject constructor(
             launch {
                 getSampleTextUseCase().collect { sampleText ->
                     _uiState.value = _uiState.value.copy(
-                        sampleText = sampleText
+                        sampleText = sampleText,
+                        currentWordIndices = getCurrentWordIndicesUseCase(sampleText, 0)
                     )
-                }
-            }
+                    wordValidator.init(sampleText)
+                    getTypingSpeedUseCase(wordValidator).collect { speedState ->
+                        _uiState.value = _uiState.value.copy(
+                            wordsPerMinute = speedState.wordsPerMinute
+                        )
 
-            launch {
-                getTypingSpeedUseCase(InputTextValidator()).collect { speed ->
-                    _uiState.value = _uiState.value.copy(
-                        wordsPerMinute = speed
-                    )
+                        if (_uiState.value.inputState != InputState.COMPLETED) {
+                            _uiState.value = _uiState.value.copy(
+                                inputState = if (speedState.isActive) InputState.ACTIVE else InputState.PAUSED
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -97,27 +102,42 @@ internal class TypingViewModel @Inject constructor(
                     phoneOrientation = screenOrientationProvider.getCurrentOrientation(),
                     username = _uiState.value.userName
                 )
+
+                val currentWordNumber = countWordUseCase(intent.text)
+
                 _uiState.value = _uiState.value.copy(
                     typedText = intent.text,
                     mistakeIndices = getMistakeIndicesUseCase(
                         _uiState.value.sampleText,
                         intent.text
                     ),
+                    currentWordIndices = getCurrentWordIndicesUseCase(
+                        _uiState.value.sampleText,
+                        currentWordNumber
+                    )
                 )
+
+                val sampleTextWordNumber = countWordUseCase(_uiState.value.sampleText)
+
+                if (currentWordNumber > sampleTextWordNumber) {
+                    _uiState.value = _uiState.value.copy(
+                        inputState = InputState.COMPLETED
+                    )
+                }
             }
             UiIntent.Restart -> clearState()
         }
     }
 
-    //TODO mark isFinished as true
-    //TODO mark isInputDisabled as true
-
     private suspend fun clearState() {
         clearEventsUseCase()
+        wordValidator.init(_uiState.value.sampleText)
         _uiState.value = _uiState.value.copy(
             typedText = "",
+            currentWordIndices = Pair(0, 0),
             mistakeIndices = emptyList(),
-            wordsPerMinute = 0f
+            wordsPerMinute = 0f,
+            inputState = InputState.ACTIVE
         )
     }
 
@@ -128,6 +148,6 @@ internal class TypingViewModel @Inject constructor(
     }
 
     companion object {
-        private val TAG = TypingViewModel.javaClass.name
+        private val TAG = TypingViewModel::class.java.simpleName
     }
 }

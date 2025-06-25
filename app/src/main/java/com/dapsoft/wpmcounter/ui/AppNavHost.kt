@@ -6,20 +6,33 @@ import androidx.navigation.NavHostController
 
 import com.dapsoft.wpmcounter.login.navigation.LoginRoute
 import com.dapsoft.wpmcounter.typing.navigation.TypingRoute
-import com.dapsoft.wpmcounter.login.navigation.navigateToLogin
-import com.dapsoft.wpmcounter.typing.navigation.navigateToTyping
+import com.dapsoft.wpmcounter.login.navigation.loginScreen
+import com.dapsoft.wpmcounter.typing.navigation.typingScreen
 
+/**
+ * Main navigation host for the application
+ * @param navController The navigation controller to use
+ * @param startDestination The initial destination route
+ */
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     startDestination: String
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
-        navigateToLogin { user ->
-            navController.navigate(TypingRoute.ROUTE)
-        }
-        navigateToTyping {
-            navController.navigate(LoginRoute.ROUTE)
-        }
+        loginScreen(
+            onLoginConfirmed = {
+                navController.navigate(TypingRoute.ROUTE) {
+                    popUpTo(LoginRoute.ROUTE) { inclusive = true }
+                }
+            }
+        )
+        typingScreen(
+            onLogout = {
+                navController.navigate(LoginRoute.ROUTE) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        )
     }
 }

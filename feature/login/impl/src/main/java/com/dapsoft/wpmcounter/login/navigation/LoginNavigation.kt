@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 
 import com.dapsoft.wpmcounter.login.ui.LoginScreen
 
-fun NavGraphBuilder.navigateToLogin(
+fun NavGraphBuilder.loginScreen(
     onLoginConfirmed: (String) -> Unit
 ) {
     composable(LoginRoute.ROUTE) {

@@ -35,6 +35,6 @@ internal class LoginViewModel @Inject constructor(
     }
 
     companion object {
-        private val TAG = LoginViewModel.javaClass.name
+        private val TAG = LoginViewModel::class.java.simpleName
     }
 }

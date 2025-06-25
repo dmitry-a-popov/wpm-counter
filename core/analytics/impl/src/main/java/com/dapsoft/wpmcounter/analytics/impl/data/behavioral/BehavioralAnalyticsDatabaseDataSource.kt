@@ -5,21 +5,22 @@ import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeyEventEn
 
 import kotlinx.coroutines.flow.Flow
 
-import javax.inject.Inject
-
-internal class BehavioralAnalyticsDatabaseDataSource @Inject constructor(
+/**
+ * Database implementation of [BehavioralAnalyticsDataSource] using Room.
+ */
+internal class BehavioralAnalyticsDatabaseDataSource (
     private val database: AnalyticsDatabase
-) {
+) : BehavioralAnalyticsDataSource {
 
-    suspend fun saveKeyEventEntity(event: KeyEventEntity) {
+    override suspend fun saveKeyEventEntity(event: KeyEventEntity) {
         database.keyEventDao().insert(event)
     }
 
-    fun getLatestKeyEventEntity(): Flow<KeyEventEntity?> {
+    override fun getLatestKeyEventEntity(): Flow<KeyEventEntity?> {
         return database.keyEventDao().getLatestEvent()
     }
 
-    suspend fun deleteAllKeyEventEntities() {
+    override suspend fun deleteAllKeyEventEntities() {
         database.keyEventDao().deleteAllEvents()
     }
 }

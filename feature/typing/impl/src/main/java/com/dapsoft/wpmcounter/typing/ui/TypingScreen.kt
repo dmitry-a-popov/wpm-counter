@@ -1,6 +1,5 @@
 package com.dapsoft.wpmcounter.typing.ui
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,15 +18,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onInterceptKeyBeforeSoftKeyboard
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.onPreInterceptKeyBeforeSoftKeyboard
 import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,22 +53,39 @@ internal fun TypingScreen(
     }
 
     val uiState = vm.uiState.collectAsState().value
+    val scrollState = rememberScrollState()
+
+    val annotatedSampleText = remember(uiState.sampleText, uiState.currentWordIndices) {
+        vm.textMarker.markCurrentWord(uiState.sampleText, uiState.currentWordIndices)
+    }
 
     val textFieldValue = TextFieldValue(
         text = uiState.typedText,
         selection = TextRange(uiState.typedText.length)
     )
 
-    Column(Modifier.padding(16.dp)) {
+    Column(
+        Modifier
+            .padding(16.dp)
+            .verticalScroll(scrollState)
+    ) {
         Text(
-            text = "Speed (WPM): ${uiState.wordsPerMinute}${if (uiState.isCalculationPaused) "PAUSED" else ""}",
+            text = "Speed (WPM): ${uiState.wordsPerMinute}",
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 24.sp
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = uiState.inputState.displayText,
             modifier = Modifier.fillMaxWidth(),
             fontSize = 24.sp
         )
         Spacer(Modifier.height(16.dp))
         Text("Hello, ${uiState.userName}, please type the following text:")
         Spacer(Modifier.height(16.dp))
-        Text(uiState.sampleText)
+        Text(
+            text = annotatedSampleText
+        )
         Spacer(Modifier.height(16.dp))
         BasicTextField(
             value = textFieldValue,
@@ -90,7 +103,7 @@ internal fun TypingScreen(
             ),
             visualTransformation = VisualTransformation {
                 TransformedText(
-                    vm.mistakesMarker.mark(uiState.typedText, uiState.mistakeIndices),
+                    vm.textMarker.markMistakes(uiState.typedText, uiState.mistakeIndices),
                     OffsetMapping.Identity
                 )
             },
@@ -100,8 +113,8 @@ internal fun TypingScreen(
                 .onPreviewKeyEvent {
                     it.key == Key.Backspace
                 }
-                .alpha(if (uiState.isInputDisabled) 0.6f else 1f),
-            enabled = !uiState.isInputDisabled,
+                .alpha(if (!uiState.inputState.isInputEnabled) 0.6f else 1f),
+            enabled = uiState.inputState.isInputEnabled,
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier

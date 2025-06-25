@@ -32,6 +32,7 @@ android {
 
 dependencies {
     implementation(project(":core:common:api"))
+    implementation(project(":core:logger:api"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.hilt.android)

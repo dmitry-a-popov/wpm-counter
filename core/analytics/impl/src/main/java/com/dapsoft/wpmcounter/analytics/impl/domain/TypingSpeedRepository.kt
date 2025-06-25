@@ -11,6 +11,5 @@ internal interface TypingSpeedRepository {
     fun clearCurrentWord()
     fun getCurrentWord(): String
 
-    fun addTimeToCurrentWord(timeMillis: Long)
-    fun getCurrentWordTypingTime(): Long
+    fun clearState()
 }

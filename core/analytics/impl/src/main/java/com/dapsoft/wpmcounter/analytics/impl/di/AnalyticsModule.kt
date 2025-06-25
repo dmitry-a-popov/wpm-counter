@@ -5,12 +5,15 @@ import android.content.Context
 import androidx.room.Room
 
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
-import com.dapsoft.wpmcounter.analytics.GetTypingSpeedUseCase
+import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDatabaseDataSource
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsRepositoryImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.AnalyticsDatabase
 import com.dapsoft.wpmcounter.analytics.impl.data.TypingSpeedRepositoryImpl
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDataSource
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapper
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapperImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.BehavioralAnalyticsRepository
 import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.GetTypingSpeedUseCaseImpl
@@ -41,17 +44,32 @@ object AnalyticsModule {
     }
 
     @Provides
+    internal fun provideBehavioralAnalyticsDataSource(
+        database: AnalyticsDatabase
+    ): BehavioralAnalyticsDataSource {
+        return BehavioralAnalyticsDatabaseDataSource(database)
+    }
+
+    @Provides
+    internal fun provideKeyEventMapper() : KeyEventMapper {
+        return KeyEventMapperImpl()
+    }
+
+    @Provides
     internal fun provideBehavioralAnalyticsRepository(
-        dataSource: BehavioralAnalyticsDatabaseDataSource
+        dataSource: BehavioralAnalyticsDataSource,
+        mapper: KeyEventMapper,
+        log: Logger
     ): BehavioralAnalyticsRepository {
-        return BehavioralAnalyticsRepositoryImpl(dataSource)
+        return BehavioralAnalyticsRepositoryImpl(dataSource, mapper, log)
     }
 
     @Provides
     internal fun provideClearEventsUseCase(
-        behavioralAnalyticsRepository: BehavioralAnalyticsRepository
+        behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
+        typingSpeedRepository: TypingSpeedRepository
     ): ClearEventsUseCase {
-        return ClearEventUseCaseImpl(behavioralAnalyticsRepository)
+        return ClearEventUseCaseImpl(behavioralAnalyticsRepository, typingSpeedRepository)
     }
 
     @Provides

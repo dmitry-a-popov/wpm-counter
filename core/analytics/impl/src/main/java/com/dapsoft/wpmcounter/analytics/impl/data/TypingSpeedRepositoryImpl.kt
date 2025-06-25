@@ -28,11 +28,12 @@ internal class TypingSpeedRepositoryImpl : TypingSpeedRepository {
         return currentWord.toString()
     }
 
-    override fun addTimeToCurrentWord(timeMillis: Long) {
-        currentWordTimeMillis += timeMillis
-    }
-
-    override fun getCurrentWordTypingTime(): Long {
-        return currentWordTimeMillis
+    override fun clearState() {
+        startTimestamp = 0L
+        lastTimestamp = 0L
+        totalActiveTypingTimeMillis = 0L
+        validWordCount = 0
+        clearCurrentWord()
+        currentWordTimeMillis = 0L
     }
 }

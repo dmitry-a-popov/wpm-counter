@@ -6,10 +6,10 @@ import androidx.navigation.compose.composable
 
 import com.dapsoft.wpmcounter.typing.ui.TypingScreen
 
-fun NavGraphBuilder.navigateToTyping(
-    onFinished: () -> Unit
+fun NavGraphBuilder.typingScreen(
+    onLogout: () -> Unit
 ) {
     composable(TypingRoute.ROUTE) {
-        TypingScreen(vm = hiltViewModel(), onChangeUser = onFinished)
+        TypingScreen(vm = hiltViewModel(), onChangeUser = onLogout)
     }
 }

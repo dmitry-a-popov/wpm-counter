@@ -1,4 +1,4 @@
-package com.dapsoft.wpmcounter.common.screenorientation
+package com.dapsoft.wpmcounter.common.orientation
 
 interface ScreenOrientationProvider {
 

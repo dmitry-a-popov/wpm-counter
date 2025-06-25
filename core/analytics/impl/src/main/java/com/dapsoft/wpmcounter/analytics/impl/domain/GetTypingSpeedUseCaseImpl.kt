@@ -1,13 +1,15 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain
 
-import com.dapsoft.wpmcounter.analytics.GetTypingSpeedUseCase
-import com.dapsoft.wpmcounter.analytics.WordValidator
+import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
+import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeyEvent
+import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
 import com.dapsoft.wpmcounter.logger.Logger
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transformLatest
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -17,11 +19,15 @@ internal class GetTypingSpeedUseCaseImpl(
     private val log: Logger
 ) : GetTypingSpeedUseCase {
 
-    override fun invoke(validator: WordValidator): Flow<Float> {
-        return analyticsRepo.getLatestEvent().map { event ->
-            event?.let {
+    override fun invoke(validator: WordValidator): Flow<TypingSpeedState> {
+        return analyticsRepo.getLatestEvent().transformLatest { event ->
+            val speed = event?.let {
+                log.d(TAG, "Calculate speed for key event: $it")
                 calculateWordsPerMinute(event, validator)
             } ?: calculateSpeed()
+            emit(TypingSpeedState(wordsPerMinute = speed, isActive = true))
+            delay(PAUSE_THRESHOLD)
+            emit(TypingSpeedState(wordsPerMinute = speed, isActive = false))
         }.distinctUntilChanged()
     }
 
@@ -29,6 +35,7 @@ internal class GetTypingSpeedUseCaseImpl(
         if (typingSpeedRepository.startTimestamp == 0L) {
             typingSpeedRepository.startTimestamp = event.keyPressTime
             typingSpeedRepository.lastTimestamp = event.keyReleaseTime
+            processSymbol(event.keyCode, validator)
             return 0f
         }
 
@@ -36,27 +43,27 @@ internal class GetTypingSpeedUseCaseImpl(
         val isWithinPauseThreshold = timeDiff < PAUSE_THRESHOLD.inWholeMilliseconds
 
         if (isWithinPauseThreshold) {
-            typingSpeedRepository.addTimeToCurrentWord(timeDiff)
+            typingSpeedRepository.totalActiveTypingTimeMillis += timeDiff
         }
 
-        val char = event.keyCode
+        processSymbol(event.keyCode, validator)
 
-        if (char == ' ' || char == '\n' || char == '\t') {
+        typingSpeedRepository.lastTimestamp = event.keyReleaseTime
+        return calculateSpeed()
+    }
+
+    private fun processSymbol(symbol: Char, validator: WordValidator) {
+        if (symbol == ' ' || symbol == '\n' || symbol == '\t') {
             val currentWord = typingSpeedRepository.getCurrentWord()
             if (currentWord.isNotEmpty()) {
-                val word = currentWord
-                if (validator.isValidWord(word)) {
-                    typingSpeedRepository.validWordCount = typingSpeedRepository.validWordCount + 1
-                    typingSpeedRepository.totalActiveTypingTimeMillis += typingSpeedRepository.getCurrentWordTypingTime()
+                if (validator.isValid(currentWord)) {
+                    typingSpeedRepository.validWordCount += 1
                 }
                 typingSpeedRepository.clearCurrentWord()
             }
         } else {
-            typingSpeedRepository.appendSymbolToCurrentWord(char)
+            typingSpeedRepository.appendSymbolToCurrentWord(symbol)
         }
-
-        typingSpeedRepository.lastTimestamp = event.keyReleaseTime
-        return calculateSpeed()
     }
 
     private fun calculateSpeed(): Float {

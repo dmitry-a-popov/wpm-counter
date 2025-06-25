@@ -2,8 +2,8 @@ package com.dapsoft.wpmcounter.common
 
 import android.content.Context
 
-import com.dapsoft.wpmcounter.common.screenorientation.ScreenOrientation
-import com.dapsoft.wpmcounter.common.screenorientation.ScreenOrientationProvider
+import com.dapsoft.wpmcounter.common.orientation.ScreenOrientation
+import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 
 internal class ScreenOrientationProviderImpl(private val context: Context) : ScreenOrientationProvider {
 

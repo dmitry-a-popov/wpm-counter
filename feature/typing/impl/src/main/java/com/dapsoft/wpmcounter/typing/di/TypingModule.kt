@@ -1,6 +1,10 @@
 package com.dapsoft.wpmcounter.typing.di
 
 import com.dapsoft.wpmcounter.typing.data.SampleTextRepositoryImpl
+import com.dapsoft.wpmcounter.typing.domain.CountWordUseCase
+import com.dapsoft.wpmcounter.typing.domain.CountWordUseCaseImpl
+import com.dapsoft.wpmcounter.typing.domain.GetCurrentWordIndicesUseCase
+import com.dapsoft.wpmcounter.typing.domain.GetCurrentWordIndicesUseCaseImpl
 import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCaseImpl
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
@@ -32,5 +36,16 @@ object TypingModule {
         getSampleTextUseCase: GetSampleTextUseCase
     ): GetMistakeIndicesUseCase {
         return GetMistakeIndicesUseCaseImpl()
+    }
+
+    @Provides
+    internal fun provideCountWordsUseCase(): CountWordUseCase {
+        return CountWordUseCaseImpl()
+    }
+
+    @Provides
+    internal fun provideGetCurrentWordIndicesUseCase(
+    ): GetCurrentWordIndicesUseCase {
+        return GetCurrentWordIndicesUseCaseImpl()
     }
 }

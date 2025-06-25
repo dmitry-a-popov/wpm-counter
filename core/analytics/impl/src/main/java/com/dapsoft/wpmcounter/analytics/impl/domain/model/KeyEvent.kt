@@ -1,6 +1,6 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain.model
 
-import com.dapsoft.wpmcounter.common.screenorientation.ScreenOrientation
+import com.dapsoft.wpmcounter.common.orientation.ScreenOrientation
 
 data class KeyEvent(
     val keyPressTime: Long,
