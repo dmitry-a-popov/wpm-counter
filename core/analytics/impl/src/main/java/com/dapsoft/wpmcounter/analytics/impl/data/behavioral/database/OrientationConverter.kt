@@ -8,7 +8,7 @@ import com.dapsoft.wpmcounter.common.orientation.ScreenOrientation
  * Room TypeConverter for persisting ScreenOrientation enum values.
  * Handles conversion between database integer representation and domain model.
  */
-class OrientationConverter {
+internal class OrientationConverter {
     /**
      * Converts a ScreenOrientation enum to its integer representation for storage.
      *
