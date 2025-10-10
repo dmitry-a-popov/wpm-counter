@@ -52,7 +52,7 @@ internal class TypingViewModel @Inject constructor(
         typedText = "",
         mistakeIndices = emptyList(),
         wordsPerMinute = 0F,
-        inputState = InputState.ACTIVE
+        inputState = InputState.PAUSED
     )
 ) {
 
@@ -137,7 +137,7 @@ internal class TypingViewModel @Inject constructor(
             currentWordIndices = Pair(0, 0),
             mistakeIndices = emptyList(),
             wordsPerMinute = 0f,
-            inputState = InputState.ACTIVE
+            inputState = InputState.PAUSED
         )
     }
 

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 abstract class BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(private val initialUiState: UiState) : ViewModel() {
 
-    protected val _uiState = MutableStateFlow<UiState>(initialUiState)
+    protected val _uiState = MutableStateFlow(initialUiState)
     val uiState: StateFlow<UiState> = _uiState
 
     protected val _oneTimeEvent = OneTimeEventFlow<OneTimeEvent>()

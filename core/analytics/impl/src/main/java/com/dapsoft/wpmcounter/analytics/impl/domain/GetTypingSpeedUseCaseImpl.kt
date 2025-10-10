@@ -22,13 +22,13 @@ internal class GetTypingSpeedUseCaseImpl(
 
     override fun invoke(validator: WordValidator): Flow<TypingSpeedState> {
         return analyticsRepo.getLatestEvent().transformLatest { event ->
-            val speed = event?.let {
+            event?.let {
                 log.d(TAG, "Calculate speed for key event: $it")
-                calculateWordsPerMinute(event, validator)
-            } ?: calculateSpeed()
-            emit(TypingSpeedState(wordsPerMinute = speed, isActive = true))
-            delay(PAUSE_THRESHOLD)
-            emit(TypingSpeedState(wordsPerMinute = speed, isActive = false))
+                val speed = calculateWordsPerMinute(event, validator)
+                emit(TypingSpeedState(wordsPerMinute = speed, isActive = true))
+                delay(PAUSE_THRESHOLD)
+                emit(TypingSpeedState(wordsPerMinute = speed, isActive = false))
+            }
         }.distinctUntilChanged()
     }
 
