@@ -54,7 +54,7 @@ internal class GetTypingSpeedUseCaseImpl(
     }
 
     private fun processSymbol(symbol: Char, validator: WordValidator) {
-        if (symbol == ' ' || symbol == '\n' || symbol == '\t') {
+        if (symbol.isWhitespace()) {
             val currentWord = wordRepository.getCurrentWord()
             if (currentWord.isNotEmpty()) {
                 if (validator.isValid(currentWord)) {

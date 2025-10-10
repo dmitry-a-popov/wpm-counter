@@ -103,7 +103,7 @@ internal class TypingViewModel @Inject constructor(
                     username = _uiState.value.userName
                 )
 
-                val currentWordNumber = wordCounter.count(intent.text)
+                val currentWordNumber = wordCounter.count(intent.text) - 1 + if (intent.text.lastOrNull()?.isWhitespace() == true) 1 else 0
 
                 _uiState.value = _uiState.value.copy(
                     typedText = intent.text,
@@ -119,7 +119,7 @@ internal class TypingViewModel @Inject constructor(
 
                 val sampleTextWordNumber = wordCounter.count(_uiState.value.sampleText)
 
-                if (currentWordNumber > sampleTextWordNumber) {
+                if (currentWordNumber + 1 > sampleTextWordNumber) {
                     _uiState.value = _uiState.value.copy(
                         inputState = InputState.COMPLETED
                     )
