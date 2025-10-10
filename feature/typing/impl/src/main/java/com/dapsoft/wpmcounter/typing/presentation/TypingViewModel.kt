@@ -6,10 +6,10 @@ import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.common.TimeProvider
+import com.dapsoft.wpmcounter.common.WordCounter
 import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.logger.Logger
-import com.dapsoft.wpmcounter.typing.domain.CountWordUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetCurrentWordIndicesUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
@@ -39,7 +39,7 @@ internal class TypingViewModel @Inject constructor(
     private val getTypingSpeedUseCase: GetTypingSpeedUseCase,
     private val getCurrentWordIndicesUseCase: GetCurrentWordIndicesUseCase,
     private val screenOrientationProvider: ScreenOrientationProvider,
-    private val countWordUseCase: CountWordUseCase,
+    private val wordCounter: WordCounter,
     private val timeProvider: TimeProvider,
     private val wordValidator: WordValidator,
     val textMarker: TextMarker,
@@ -60,7 +60,7 @@ internal class TypingViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 getUserNameUseCase().collect { userName ->
-                    if (userName.isNotEmpty() == true) {
+                    if (userName.isNotEmpty()) {
                         _uiState.value = _uiState.value.copy(
                             userName = userName
                         )
@@ -103,7 +103,7 @@ internal class TypingViewModel @Inject constructor(
                     username = _uiState.value.userName
                 )
 
-                val currentWordNumber = countWordUseCase(intent.text)
+                val currentWordNumber = wordCounter.count(intent.text)
 
                 _uiState.value = _uiState.value.copy(
                     typedText = intent.text,
@@ -117,7 +117,7 @@ internal class TypingViewModel @Inject constructor(
                     )
                 )
 
-                val sampleTextWordNumber = countWordUseCase(_uiState.value.sampleText)
+                val sampleTextWordNumber = wordCounter.count(_uiState.value.sampleText)
 
                 if (currentWordNumber > sampleTextWordNumber) {
                     _uiState.value = _uiState.value.copy(

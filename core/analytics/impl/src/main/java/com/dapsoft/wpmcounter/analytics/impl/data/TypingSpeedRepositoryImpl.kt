@@ -12,28 +12,10 @@ internal class TypingSpeedRepositoryImpl : TypingSpeedRepository {
 
     override var validWordCount: Int = 0
 
-    private val currentWord = StringBuilder()
-    private var currentWordTimeMillis: Long = 0L
-
-    override fun appendSymbolToCurrentWord(symbol: Char) {
-        currentWord.append(symbol)
-    }
-
-    override fun clearCurrentWord() {
-        currentWord.clear()
-        currentWordTimeMillis = 0
-    }
-
-    override fun getCurrentWord(): String {
-        return currentWord.toString()
-    }
-
     override fun clearState() {
         startTimestamp = 0L
         lastTimestamp = 0L
         totalActiveTypingTimeMillis = 0L
         validWordCount = 0
-        clearCurrentWord()
-        currentWordTimeMillis = 0L
     }
 }

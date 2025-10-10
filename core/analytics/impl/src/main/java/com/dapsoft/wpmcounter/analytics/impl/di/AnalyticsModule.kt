@@ -11,6 +11,7 @@ import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalytics
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsRepositoryImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.AnalyticsDatabase
 import com.dapsoft.wpmcounter.analytics.impl.data.TypingSpeedRepositoryImpl
+import com.dapsoft.wpmcounter.analytics.impl.data.WordRepositoryImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDataSource
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapper
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapperImpl
@@ -19,6 +20,7 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.GetTypingSpeedUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSpeedRepository
+import com.dapsoft.wpmcounter.analytics.impl.domain.WordRepository
 import com.dapsoft.wpmcounter.logger.Logger
 
 import dagger.Module
@@ -65,11 +67,17 @@ object AnalyticsModule {
     }
 
     @Provides
+    internal fun provideWordRepository() : WordRepository {
+        return WordRepositoryImpl();
+    }
+
+    @Provides
     internal fun provideClearEventsUseCase(
         behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
-        typingSpeedRepository: TypingSpeedRepository
+        typingSpeedRepository: TypingSpeedRepository,
+        wordRepository: WordRepository
     ): ClearEventsUseCase {
-        return ClearEventUseCaseImpl(behavioralAnalyticsRepository, typingSpeedRepository)
+        return ClearEventUseCaseImpl(behavioralAnalyticsRepository, typingSpeedRepository, wordRepository)
     }
 
     @Provides
@@ -89,8 +97,9 @@ object AnalyticsModule {
     internal fun provideGetTypingSpeedUseCase(
         analyticsRepository: BehavioralAnalyticsRepository,
         typingSpeedRepository: TypingSpeedRepository,
+        wordRepository: WordRepository,
         log: Logger
     ): GetTypingSpeedUseCase {
-        return GetTypingSpeedUseCaseImpl(analyticsRepository, typingSpeedRepository, log)
+        return GetTypingSpeedUseCaseImpl(analyticsRepository, typingSpeedRepository, wordRepository, log)
     }
 }

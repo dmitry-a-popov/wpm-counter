@@ -3,6 +3,9 @@ package com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeyEventEntity
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeyEvent
 
+/**
+ * Implements mapping between KeyEvent domain models and KeyEventEntity data objects.
+ */
 internal class KeyEventMapperImpl : KeyEventMapper {
 
     override fun toEntity(domain: KeyEvent): KeyEventEntity {

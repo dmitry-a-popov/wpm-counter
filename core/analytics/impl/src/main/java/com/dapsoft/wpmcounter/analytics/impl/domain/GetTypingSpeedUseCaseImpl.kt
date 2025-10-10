@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 internal class GetTypingSpeedUseCaseImpl(
     private val analyticsRepo: BehavioralAnalyticsRepository,
     private val typingSpeedRepository: TypingSpeedRepository,
+    private val wordRepository: WordRepository,
     private val log: Logger
 ) : GetTypingSpeedUseCase {
 
@@ -54,15 +55,15 @@ internal class GetTypingSpeedUseCaseImpl(
 
     private fun processSymbol(symbol: Char, validator: WordValidator) {
         if (symbol == ' ' || symbol == '\n' || symbol == '\t') {
-            val currentWord = typingSpeedRepository.getCurrentWord()
+            val currentWord = wordRepository.getCurrentWord()
             if (currentWord.isNotEmpty()) {
                 if (validator.isValid(currentWord)) {
                     typingSpeedRepository.validWordCount += 1
                 }
-                typingSpeedRepository.clearCurrentWord()
+                wordRepository.clearCurrentWord()
             }
         } else {
-            typingSpeedRepository.appendSymbolToCurrentWord(symbol)
+            wordRepository.appendSymbolToCurrentWord(symbol)
         }
     }
 

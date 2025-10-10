@@ -8,6 +8,10 @@ import com.dapsoft.wpmcounter.logger.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * Implementation of [BehavioralAnalyticsRepository] that uses a local data source
+ * for storing and retrieving behavioral analytics data.
+ */
 internal class BehavioralAnalyticsRepositoryImpl(
     private val dataSource: BehavioralAnalyticsDataSource,
     private val mapper: KeyEventMapper,

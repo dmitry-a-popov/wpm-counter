@@ -5,6 +5,8 @@ import android.content.Context
 import com.dapsoft.wpmcounter.common.ScreenOrientationProviderImpl
 import com.dapsoft.wpmcounter.common.SystemTimeProvider
 import com.dapsoft.wpmcounter.common.TimeProvider
+import com.dapsoft.wpmcounter.common.WordCounter
+import com.dapsoft.wpmcounter.common.WordCounterImpl
 import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.common.validation.TextValidator
 import com.dapsoft.wpmcounter.common.validation.TextValidatorImpl
@@ -42,5 +44,10 @@ object CommonModule {
     @Provides
     internal fun provideTextValidator(wordValidator: WordValidator): TextValidator {
         return TextValidatorImpl(wordValidator)
+    }
+
+    @Provides
+    internal fun provideWordCounter(): WordCounter {
+        return WordCounterImpl()
     }
 }

@@ -7,9 +7,5 @@ internal interface TypingSpeedRepository {
     var totalActiveTypingTimeMillis: Long
     var validWordCount: Int
 
-    fun appendSymbolToCurrentWord(symbol: Char)
-    fun clearCurrentWord()
-    fun getCurrentWord(): String
-
     fun clearState()
 }
