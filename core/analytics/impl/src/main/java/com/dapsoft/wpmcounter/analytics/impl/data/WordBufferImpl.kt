@@ -1,8 +1,8 @@
 package com.dapsoft.wpmcounter.analytics.impl.data
 
-import com.dapsoft.wpmcounter.analytics.impl.domain.WordRepository
+import com.dapsoft.wpmcounter.analytics.impl.domain.WordBuffer
 
-internal class WordRepositoryImpl : WordRepository {
+internal class WordBufferImpl : WordBuffer {
 
     private val currentWord = StringBuilder()
 
