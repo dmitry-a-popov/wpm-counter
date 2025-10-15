@@ -4,15 +4,16 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.model.SessionState
 import com.dapsoft.wpmcounter.common.validation.WordValidator
 
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class TypingSessionUpdaterImpl(private val typingSessionStateStore: TypingSessionStateStore) : TypingSessionUpdater {
 
-    override fun onEvent(symbol: Char, timestamp: Long, pauseThreshold: Duration, validator: WordValidator) : SessionState {
+    override fun onEvent(symbol: Char, timestamp: Duration, pauseThreshold: Duration, validator: WordValidator) : SessionState {
         val currentState = typingSessionStateStore.state
 
         val newTimestamp = timestamp
-        val timeDiff = if (currentState.timestamp == 0L) 0L else timestamp - currentState.timestamp
-        val isWithinPauseThreshold = timeDiff < pauseThreshold.inWholeMilliseconds
+        val timeDiff = if (currentState.timestamp.inWholeMilliseconds == 0L) 0.milliseconds else timestamp.minus(currentState.timestamp)
+        val isWithinPauseThreshold = timeDiff < pauseThreshold
         val newTotalActiveTypingTimeMillis = if (isWithinPauseThreshold) currentState.totalActiveTypingTimeMillis + timeDiff else currentState.totalActiveTypingTimeMillis
 
         var nextWord = currentState.currentWord

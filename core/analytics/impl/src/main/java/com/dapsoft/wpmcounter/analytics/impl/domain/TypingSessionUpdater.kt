@@ -6,5 +6,5 @@ import com.dapsoft.wpmcounter.common.validation.WordValidator
 import kotlin.time.Duration
 
 internal interface TypingSessionUpdater {
-    fun onEvent(symbol: Char, timestamp: Long, pauseThreshold: Duration, validator: WordValidator): SessionState
+    fun onEvent(symbol: Char, timestamp: Duration, pauseThreshold: Duration, validator: WordValidator): SessionState
 }

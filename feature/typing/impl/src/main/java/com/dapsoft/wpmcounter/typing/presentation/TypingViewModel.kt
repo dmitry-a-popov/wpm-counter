@@ -98,7 +98,7 @@ internal class TypingViewModel @Inject constructor(
             is UiIntent.ChangeTypedText -> if (intent.text.length > _uiState.value.typedText.length) {
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
-                    eventTimeMillis = timeProvider.getElapsedRealtime(),
+                    eventTime = timeProvider.getElapsedRealtime(),
                     phoneOrientation = screenOrientationProvider.getCurrentOrientation(),
                     username = _uiState.value.userName
                 )

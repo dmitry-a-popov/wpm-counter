@@ -8,7 +8,7 @@ import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.impl.data.InMemoryTypingSessionStateStore
-import com.dapsoft.wpmcounter.analytics.impl.data.SpeedCalculatorImpl
+import com.dapsoft.wpmcounter.analytics.impl.domain.SpeedCalculatorImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDatabaseDataSource
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsRepositoryImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.AnalyticsDatabase

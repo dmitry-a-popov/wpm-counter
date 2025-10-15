@@ -3,6 +3,9 @@ package com.dapsoft.wpmcounter.analytics.impl.data
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionStateStore
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.SessionState
 
+/**
+ * In-memory implementation of TypingSessionStateStore.
+ */
 internal class InMemoryTypingSessionStateStore : TypingSessionStateStore {
 
     private var _state: SessionState = SessionState()

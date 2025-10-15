@@ -1,8 +1,11 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain.model
 
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+
 data class SessionState(
-    val timestamp: Long = 0L,
-    val totalActiveTypingTimeMillis: Long = 0L,
+    val timestamp: Duration = 0.milliseconds,
+    val totalActiveTypingTimeMillis: Duration = 0.milliseconds,
     val validWordCount: Int = 0,
     val currentWord: String = ""
 )

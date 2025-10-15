@@ -27,17 +27,17 @@ internal class GetTypingSpeedUseCaseImpl(
             .getLatestEvent()
             .filterNotNull()
             .map { event ->
-                val sessionState = sessionUpdater.onEvent(event.symbol, event.eventTimeMillis, PAUSE_THRESHOLD, validator)
+                val sessionState = sessionUpdater.onEvent(event.symbol, event.eventTime, PAUSE_THRESHOLD, validator)
                 log.d(TAG, "Current session state: $sessionState")
                 TypingSpeedState(
-                    wordsPerMinute = speedCalculator.calculateWordPerMinute(sessionState.validWordCount, sessionState.totalActiveTypingTimeMillis),
+                    wordsPerMinute = speedCalculator.calculateWordsPerMinute(sessionState.validWordCount, sessionState.totalActiveTypingTimeMillis),
                     isActive = true
                 )
             }
             .flatMapLatest { activeState ->
                 flow {
                     emit(activeState)
-                    delay(PAUSE_THRESHOLD.inWholeMilliseconds)
+                    delay(PAUSE_THRESHOLD)
                     emit(activeState.copy(isActive = false))
                 }
 
