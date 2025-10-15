@@ -7,12 +7,11 @@ import androidx.room.Room
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
+import com.dapsoft.wpmcounter.analytics.impl.data.InMemoryTypingSessionStateStore
 import com.dapsoft.wpmcounter.analytics.impl.data.SpeedCalculatorImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDatabaseDataSource
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsRepositoryImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.AnalyticsDatabase
-import com.dapsoft.wpmcounter.analytics.impl.data.TypingSpeedRepositoryImpl
-import com.dapsoft.wpmcounter.analytics.impl.data.WordBufferImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDataSource
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapper
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapperImpl
@@ -21,8 +20,9 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.GetTypingSpeedUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.SpeedCalculator
 import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
-import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSpeedRepository
-import com.dapsoft.wpmcounter.analytics.impl.domain.WordBuffer
+import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionStateStore
+import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionUpdater
+import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionUpdaterImpl
 import com.dapsoft.wpmcounter.logger.Logger
 
 import dagger.Module
@@ -69,17 +69,11 @@ object AnalyticsModule {
     }
 
     @Provides
-    internal fun provideWordRepository() : WordBuffer {
-        return WordBufferImpl();
-    }
-
-    @Provides
     internal fun provideClearEventsUseCase(
         behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
-        typingSpeedRepository: TypingSpeedRepository,
-        wordBuffer: WordBuffer
+        typingSessionStateStore: TypingSessionStateStore
     ): ClearEventsUseCase {
-        return ClearEventUseCaseImpl(behavioralAnalyticsRepository, typingSpeedRepository, wordBuffer)
+        return ClearEventUseCaseImpl(behavioralAnalyticsRepository, typingSessionStateStore)
     }
 
     @Provides
@@ -91,23 +85,21 @@ object AnalyticsModule {
 
     @Provides
     @Singleton
-    internal fun provideWordsRepository() : TypingSpeedRepository {
-        return TypingSpeedRepositoryImpl()
+    internal fun provideTypingSessionStateStore(): TypingSessionStateStore {
+        return InMemoryTypingSessionStateStore()
     }
 
     @Provides
     internal fun provideGetTypingSpeedUseCase(
-        analyticsRepository: BehavioralAnalyticsRepository,
-        typingSpeedRepository: TypingSpeedRepository,
-        wordBuffer: WordBuffer,
+        analyticsRepo: BehavioralAnalyticsRepository,
         speedCalculator: SpeedCalculator,
+        typingSessionUpdater: TypingSessionUpdater,
         log: Logger
     ): GetTypingSpeedUseCase {
         return GetTypingSpeedUseCaseImpl(
-            analyticsRepository,
-            typingSpeedRepository,
-            wordBuffer,
+            analyticsRepo,
             speedCalculator,
+            typingSessionUpdater,
             log
         )
     }
@@ -115,5 +107,11 @@ object AnalyticsModule {
     @Provides
     internal fun provideSpeedCalculator(log: Logger): SpeedCalculator {
         return SpeedCalculatorImpl(log)
+    }
+
+    @Provides
+    internal fun provideTypingSessionUpdater(typingSessionStateStore: TypingSessionStateStore): TypingSessionUpdater {
+        return TypingSessionUpdaterImpl(typingSessionStateStore)
+
     }
 }

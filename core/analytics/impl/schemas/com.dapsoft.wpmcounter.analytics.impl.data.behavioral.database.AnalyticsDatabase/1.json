@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5a3be31e2887460bd9e8cee7aae62246",
+    "identityHash": "6f8ff0360202bab4a5fd371ef8c6f2be",
     "entities": [
       {
         "tableName": "key_events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyPressTime` INTEGER NOT NULL, `keyReleaseTime` INTEGER NOT NULL, `keyCode` INTEGER NOT NULL, `phoneOrientation` INTEGER NOT NULL, `username` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eventTimeMillis` INTEGER NOT NULL, `symbol` INTEGER NOT NULL, `phoneOrientation` INTEGER NOT NULL, `username` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -15,20 +15,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "keyPressTime",
-            "columnName": "keyPressTime",
+            "fieldPath": "eventTimeMillis",
+            "columnName": "eventTimeMillis",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "keyReleaseTime",
-            "columnName": "keyReleaseTime",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "keyCode",
-            "columnName": "keyCode",
+            "fieldPath": "symbol",
+            "columnName": "symbol",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -55,7 +49,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5a3be31e2887460bd9e8cee7aae62246')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6f8ff0360202bab4a5fd371ef8c6f2be')"
     ]
   }
 }

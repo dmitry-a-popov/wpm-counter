@@ -9,15 +9,14 @@ internal class TrackKeyPressUseCaseImpl(
 ) : TrackKeyPressUseCase {
 
     override suspend fun invoke(
-        keyCode: Char,
+        symbol: Char,
         eventTimeMillis: Long,
         phoneOrientation: ScreenOrientation,
         username: String
     ) {
         val keyEvent = KeyEvent(
-            keyPressTime = eventTimeMillis,
-            keyReleaseTime = eventTimeMillis,
-            keyCode = keyCode,
+            eventTimeMillis = eventTimeMillis,
+            symbol = symbol,
             phoneOrientation = phoneOrientation,
             username = username
         )

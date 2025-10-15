@@ -11,9 +11,8 @@ internal class KeyEventMapperImpl : KeyEventMapper {
     override fun toEntity(domain: KeyEvent): KeyEventEntity {
         return KeyEventEntity(
             id = 0, // Auto-generated
-            keyPressTime = domain.keyPressTime,
-            keyReleaseTime = domain.keyReleaseTime,
-            keyCode = domain.keyCode,
+            eventTimeMillis = domain.eventTimeMillis,
+            symbol = domain.symbol,
             phoneOrientation = domain.phoneOrientation,
             username = domain.username
         )
@@ -21,9 +20,8 @@ internal class KeyEventMapperImpl : KeyEventMapper {
 
     override fun toDomain(entity: KeyEventEntity): KeyEvent {
         return KeyEvent(
-            keyPressTime = entity.keyPressTime,
-            keyReleaseTime = entity.keyReleaseTime,
-            keyCode = entity.keyCode,
+            eventTimeMillis = entity.eventTimeMillis,
+            symbol = entity.symbol,
             phoneOrientation = entity.phoneOrientation,
             username = entity.username
         )

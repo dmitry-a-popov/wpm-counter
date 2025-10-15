@@ -23,7 +23,7 @@ internal interface KeyEventDao {
     /**
      * Retrieves the most recent keyboard event, if any exists.
      */
-    @Query("SELECT * FROM key_events ORDER BY keyReleaseTime DESC LIMIT 1")
+    @Query("SELECT * FROM key_events ORDER BY eventTimeMillis DESC LIMIT 1")
     fun getLatestEvent(): Flow<KeyEventEntity?>
 
     /**

@@ -4,13 +4,11 @@ import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 
 internal class ClearEventUseCaseImpl(
     private val behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
-    private val typingSpeedRepository: TypingSpeedRepository,
-    private val wordBuffer: WordBuffer
+    private val typingSessionStateStore: TypingSessionStateStore
 ) : ClearEventsUseCase {
 
     override suspend fun invoke() {
         behavioralAnalyticsRepository.deleteAllEvents()
-        typingSpeedRepository.clearState()
-        wordBuffer.clearCurrentWord()
+        typingSessionStateStore.reset()
     }
 }

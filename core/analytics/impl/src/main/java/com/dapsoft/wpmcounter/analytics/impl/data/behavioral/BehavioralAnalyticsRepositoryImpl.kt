@@ -22,7 +22,7 @@ internal class BehavioralAnalyticsRepositoryImpl(
         try {
             dataSource.saveKeyEventEntity(mapper.toEntity(event))
         } catch (e: Exception) {
-            log.e(TAG, "Failed to save key event: ${event.keyCode}", e)
+            log.e(TAG, "Failed to save key event: ${event.symbol}", e)
         }
     }
 
