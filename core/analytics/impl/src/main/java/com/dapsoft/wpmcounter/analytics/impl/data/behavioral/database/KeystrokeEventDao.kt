@@ -12,19 +12,19 @@ import kotlinx.coroutines.flow.Flow
  * Provides methods to store and retrieve keyboard interaction events.
  */
 @Dao
-internal interface KeyEventDao {
+internal interface KeystrokeEventDao {
     /**
      * Stores a keyboard event in the database.
      * Replaces any existing event with the same ID.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(event: KeyEventEntity)
+    suspend fun insert(event: KeystrokeEventEntity)
 
     /**
      * Retrieves the most recent keyboard event, if any exists.
      */
     @Query("SELECT * FROM key_events ORDER BY eventTimeMillis DESC LIMIT 1")
-    fun getLatestEvent(): Flow<KeyEventEntity?>
+    fun getLatestEvent(): Flow<KeystrokeEventEntity?>
 
     /**
      * Deletes all keyboard events from the database.

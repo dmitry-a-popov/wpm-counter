@@ -11,14 +11,14 @@ import androidx.room.TypeConverters
  * Schema migrations should be added when modifying the database structure.
  */
 @Database(
-    entities = [KeyEventEntity::class],
+    entities = [KeystrokeEventEntity::class],
     version = 1,
     exportSchema = true
 )
 @TypeConverters(OrientationConverter::class)
 internal abstract class AnalyticsDatabase : RoomDatabase() {
     /**
-     * Provides access to key event operations in the database.
+     * Provides access to keystroke event operations in the database.
      */
-    abstract fun keyEventDao(): KeyEventDao
+    abstract fun keystrokeEventDao(): KeystrokeEventDao
 }

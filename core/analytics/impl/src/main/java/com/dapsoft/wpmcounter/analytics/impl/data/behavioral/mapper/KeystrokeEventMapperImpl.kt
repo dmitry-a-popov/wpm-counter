@@ -1,16 +1,17 @@
 package com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper
 
-import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeyEventEntity
-import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeyEvent
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeystrokeEventEntity
+import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeystrokeEvent
+
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Implements mapping between KeyEvent domain models and KeyEventEntity data objects.
+ * Implements mapping between KeystrokeEvent domain models and KeystrokeEventEntity data objects.
  */
-internal class KeyEventMapperImpl : KeyEventMapper {
+internal class KeystrokeEventMapperImpl : KeystrokeEventMapper {
 
-    override fun toEntity(domain: KeyEvent): KeyEventEntity {
-        return KeyEventEntity(
+    override fun toEntity(domain: KeystrokeEvent): KeystrokeEventEntity {
+        return KeystrokeEventEntity(
             id = 0, // Auto-generated
             eventTimeMillis = domain.eventTime.inWholeMilliseconds,
             symbol = domain.symbol,
@@ -19,8 +20,8 @@ internal class KeyEventMapperImpl : KeyEventMapper {
         )
     }
 
-    override fun toDomain(entity: KeyEventEntity): KeyEvent {
-        return KeyEvent(
+    override fun toDomain(entity: KeystrokeEventEntity): KeystrokeEvent {
+        return KeystrokeEvent(
             eventTime = entity.eventTimeMillis.milliseconds,
             symbol = entity.symbol,
             phoneOrientation = entity.phoneOrientation,

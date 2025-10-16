@@ -13,8 +13,8 @@ import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalytics
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsRepositoryImpl
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.AnalyticsDatabase
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalyticsDataSource
-import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapper
-import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeyEventMapperImpl
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeystrokeEventMapper
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeystrokeEventMapperImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.BehavioralAnalyticsRepository
 import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.GetTypingSpeedUseCaseImpl
@@ -55,14 +55,14 @@ object AnalyticsModule {
     }
 
     @Provides
-    internal fun provideKeyEventMapper() : KeyEventMapper {
-        return KeyEventMapperImpl()
+    internal fun provideKeystrokeEventMapper() : KeystrokeEventMapper {
+        return KeystrokeEventMapperImpl()
     }
 
     @Provides
     internal fun provideBehavioralAnalyticsRepository(
         dataSource: BehavioralAnalyticsDataSource,
-        mapper: KeyEventMapper,
+        mapper: KeystrokeEventMapper,
         log: Logger
     ): BehavioralAnalyticsRepository {
         return BehavioralAnalyticsRepositoryImpl(dataSource, mapper, log)

@@ -1,7 +1,7 @@
 package com.dapsoft.wpmcounter.analytics.impl.data.behavioral
 
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.AnalyticsDatabase
-import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeyEventEntity
+import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeystrokeEventEntity
 
 import kotlinx.coroutines.flow.Flow
 
@@ -12,15 +12,15 @@ internal class BehavioralAnalyticsDatabaseDataSource (
     private val database: AnalyticsDatabase
 ) : BehavioralAnalyticsDataSource {
 
-    override suspend fun saveKeyEventEntity(event: KeyEventEntity) {
-        database.keyEventDao().insert(event)
+    override suspend fun saveKeystrokeEventEntity(event: KeystrokeEventEntity) {
+        database.keystrokeEventDao().insert(event)
     }
 
-    override fun getLatestKeyEventEntity(): Flow<KeyEventEntity?> {
-        return database.keyEventDao().getLatestEvent()
+    override fun getLatestKeystrokeEventEntity(): Flow<KeystrokeEventEntity?> {
+        return database.keystrokeEventDao().getLatestEvent()
     }
 
-    override suspend fun deleteAllKeyEventEntities() {
-        database.keyEventDao().deleteAllEvents()
+    override suspend fun deleteAllKeystrokeEventEntities() {
+        database.keystrokeEventDao().deleteAllEvents()
     }
 }

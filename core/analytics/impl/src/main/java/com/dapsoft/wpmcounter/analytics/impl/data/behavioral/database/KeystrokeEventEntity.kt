@@ -16,7 +16,7 @@ import com.dapsoft.wpmcounter.common.orientation.ScreenOrientation
  * @property username Identifier of the user who performed the action
  */
 @Entity(tableName = "key_events")
-internal data class KeyEventEntity(
+internal data class KeystrokeEventEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val eventTimeMillis: Long,
     val symbol: Char,

@@ -1,30 +1,30 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain
 
-import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeyEvent
+import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeystrokeEvent
 
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Repository for managing behavioral analytics data, specifically keyboard interaction events.
- * Provides methods for storing, retrieving and managing key event records.
+ * Provides methods for storing, retrieving and managing keystroke event records.
  */
 internal interface BehavioralAnalyticsRepository {
     /**
      * Saves a keyboard event to the repository.
      *
-     * @param event The key event to save
+     * @param event The keystroke event to save
      */
-    suspend fun saveKeyEvent(event: KeyEvent)
+    suspend fun saveEvent(event: KeystrokeEvent)
 
     /**
-     * Retrieves the most recent key event, if available.
+     * Retrieves the most recent keystroke event, if available.
      *
-     * @return Flow emitting the latest key event or null if none exists
+     * @return Flow emitting the latest keystroke event or null if none exists
      */
-    fun getLatestEvent(): Flow<KeyEvent?>
+    fun getLatestEvent(): Flow<KeystrokeEvent?>
 
     /**
-     * Deletes all stored key events.
+     * Deletes all stored keystroke events.
      */
     suspend fun deleteAllEvents()
 }

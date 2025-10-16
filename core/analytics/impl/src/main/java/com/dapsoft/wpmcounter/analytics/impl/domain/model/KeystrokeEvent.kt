@@ -4,7 +4,7 @@ import com.dapsoft.wpmcounter.common.orientation.ScreenOrientation
 
 import kotlin.time.Duration
 
-data class KeyEvent(
+data class KeystrokeEvent(
     val eventTime: Duration,
     val symbol: Char,
     val phoneOrientation: ScreenOrientation,
