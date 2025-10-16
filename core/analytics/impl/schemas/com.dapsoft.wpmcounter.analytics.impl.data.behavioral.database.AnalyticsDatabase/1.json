@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6f8ff0360202bab4a5fd371ef8c6f2be",
+    "identityHash": "51d96136259948cd9efe16c6949b0f49",
     "entities": [
       {
         "tableName": "key_events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eventTimeMillis` INTEGER NOT NULL, `symbol` INTEGER NOT NULL, `phoneOrientation` INTEGER NOT NULL, `username` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eventTimeMillis` INTEGER NOT NULL, `symbol` INTEGER NOT NULL, `screenOrientation` INTEGER NOT NULL, `username` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -27,8 +27,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "phoneOrientation",
-            "columnName": "phoneOrientation",
+            "fieldPath": "screenOrientation",
+            "columnName": "screenOrientation",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -49,7 +49,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6f8ff0360202bab4a5fd371ef8c6f2be')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '51d96136259948cd9efe16c6949b0f49')"
     ]
   }
 }

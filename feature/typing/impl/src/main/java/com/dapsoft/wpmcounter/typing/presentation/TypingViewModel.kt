@@ -99,7 +99,7 @@ internal class TypingViewModel @Inject constructor(
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
                     eventTime = timeProvider.getElapsedRealtime(),
-                    phoneOrientation = screenOrientationProvider.getCurrentOrientation(),
+                    screenOrientation = screenOrientationProvider.getCurrentOrientation(),
                     username = _uiState.value.userName
                 )
 

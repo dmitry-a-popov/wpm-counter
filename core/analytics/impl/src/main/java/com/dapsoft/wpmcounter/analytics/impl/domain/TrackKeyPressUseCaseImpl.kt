@@ -13,13 +13,13 @@ internal class TrackKeyPressUseCaseImpl(
     override suspend fun invoke(
         symbol: Char,
         eventTime: Duration,
-        phoneOrientation: ScreenOrientation,
+        screenOrientation: ScreenOrientation,
         username: String
     ) {
         val keystrokeEvent = KeystrokeEvent(
             eventTime = eventTime,
             symbol = symbol,
-            phoneOrientation = phoneOrientation,
+            screenOrientation = screenOrientation,
             username = username
         )
         behavioralAnalyticsRepository.saveEvent(keystrokeEvent)

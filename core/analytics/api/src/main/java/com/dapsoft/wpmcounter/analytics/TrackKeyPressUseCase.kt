@@ -11,13 +11,13 @@ interface TrackKeyPressUseCase {
      *
      * @param symbol The character representation of the pressed key
      * @param eventTime Timestamp when the key press occurred (since device startup)
-     * @param phoneOrientation Current orientation of the device when event occurred
+     * @param screenOrientation Current orientation of the device when event occurred
      * @param username Identifier of the user performing the action
      */
     suspend operator fun invoke(
         symbol: Char,
         eventTime: Duration,
-        phoneOrientation: ScreenOrientation,
+        screenOrientation: ScreenOrientation,
         username: String
     )
 }

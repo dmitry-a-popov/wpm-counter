@@ -15,7 +15,7 @@ internal class KeystrokeEventMapperImpl : KeystrokeEventMapper {
             id = 0, // Auto-generated
             eventTimeMillis = domain.eventTime.inWholeMilliseconds,
             symbol = domain.symbol,
-            phoneOrientation = domain.phoneOrientation,
+            screenOrientation = domain.screenOrientation,
             username = domain.username
         )
     }
@@ -24,7 +24,7 @@ internal class KeystrokeEventMapperImpl : KeystrokeEventMapper {
         return KeystrokeEvent(
             eventTime = entity.eventTimeMillis.milliseconds,
             symbol = entity.symbol,
-            phoneOrientation = entity.phoneOrientation,
+            screenOrientation = entity.screenOrientation,
             username = entity.username
         )
     }
