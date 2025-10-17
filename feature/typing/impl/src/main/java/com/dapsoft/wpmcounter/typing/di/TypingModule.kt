@@ -5,8 +5,6 @@ import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculatorImpl
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculatorImpl
-import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
-import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCaseImpl
 import com.dapsoft.wpmcounter.typing.domain.SampleTextRepository
 
 import dagger.Module
@@ -21,13 +19,6 @@ object TypingModule {
     @Provides
     internal fun provideSampleTextRepository(): SampleTextRepository {
         return SampleTextRepositoryImpl()
-    }
-
-    @Provides
-    internal fun provideGetSampleTextUseCase(
-        sampleTextRepository: SampleTextRepository
-    ): GetSampleTextUseCase {
-        return GetSampleTextUseCaseImpl(sampleTextRepository)
     }
 
     @Provides

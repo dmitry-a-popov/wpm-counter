@@ -21,7 +21,7 @@ internal class UserDataStoreDataSource @Inject constructor(
 ) {
     private val dataStore = context.userPreferences
 
-    val userNameFlow: Flow<String> = dataStore.data.map {
+    val userName: Flow<String> = dataStore.data.map {
         it[Keys.USER_NAME] ?: ""
     }
 

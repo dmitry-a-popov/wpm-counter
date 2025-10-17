@@ -12,15 +12,15 @@ import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.logger.Logger
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
-import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
+import com.dapsoft.wpmcounter.typing.domain.SampleTextRepository
 import com.dapsoft.wpmcounter.typing.ui.InputState
 import com.dapsoft.wpmcounter.typing.ui.TextMarker
 import com.dapsoft.wpmcounter.typing.ui.OneTimeEvent
 import com.dapsoft.wpmcounter.typing.ui.UiIntent
 import com.dapsoft.wpmcounter.typing.ui.UiState
 import com.dapsoft.wpmcounter.ui_common.BaseMviViewModel
-import com.dapsoft.wpmcounter.user.GetUserNameUseCase
 import com.dapsoft.wpmcounter.user.SaveUserNameUseCase
+import com.dapsoft.wpmcounter.user.UserRepository
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
@@ -30,9 +30,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class TypingViewModel @Inject constructor(
-    private val getUserNameUseCase: GetUserNameUseCase,
+    private val userRepository: UserRepository,
+    private val sampleTextRepository: SampleTextRepository,
     private val saveUserNameUseCase: SaveUserNameUseCase,
-    private val getSampleTextUseCase: GetSampleTextUseCase,
     private val clearEventsUseCase: ClearEventsUseCase,
     private val trackKeyPressUseCase: TrackKeyPressUseCase,
     private val getTypingSpeedUseCase: GetTypingSpeedUseCase,
@@ -59,7 +59,7 @@ internal class TypingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                getUserNameUseCase().collect { userName ->
+                userRepository.name.collect { userName ->
                     if (userName.isNotEmpty()) {
                         _uiState.value = _uiState.value.copy(
                             userName = userName
@@ -69,7 +69,7 @@ internal class TypingViewModel @Inject constructor(
             }
 
             launch {
-                getSampleTextUseCase().collect { sampleText ->
+                sampleTextRepository.text.collect { sampleText ->
                     _uiState.value = _uiState.value.copy(
                         sampleText = sampleText,
                         currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)

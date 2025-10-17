@@ -12,7 +12,7 @@ import com.dapsoft.wpmcounter.login.navigation.LoginRoute
 import com.dapsoft.wpmcounter.typing.navigation.TypingRoute
 import com.dapsoft.wpmcounter.ui.AppNavHost
 import com.dapsoft.wpmcounter.ui.root.state.StartupState
-import com.dapsoft.wpmcounter.user.GetUserNameUseCase
+import com.dapsoft.wpmcounter.user.UserRepository
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
@@ -24,10 +24,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AppEntryViewModel @Inject constructor(
-    private val getUserNameUseCase: GetUserNameUseCase
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    val startupState = getUserNameUseCase()
+    val startupState = userRepository.name
         .map { name ->
             when {
                 name.isBlank() -> StartupState.UserRequired
