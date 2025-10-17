@@ -5,9 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
-import com.dapsoft.wpmcounter.common.TimeProvider
 import com.dapsoft.wpmcounter.common.WordCounter
-import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.logger.Logger
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
@@ -38,9 +36,7 @@ internal class TypingViewModel @Inject constructor(
     private val getTypingSpeedUseCase: GetTypingSpeedUseCase,
     private val currentWordIndicesCalculator: CurrentWordIndicesCalculator,
     private val mistakeIndicesCalculator: MistakeIndicesCalculator,
-    private val screenOrientationProvider: ScreenOrientationProvider,
     private val wordCounter: WordCounter,
-    private val timeProvider: TimeProvider,
     private val wordValidator: WordValidator,
     val textMarker: TextMarker,
     val log: Logger
@@ -98,8 +94,6 @@ internal class TypingViewModel @Inject constructor(
             is UiIntent.ChangeTypedText -> if (intent.text.length > _uiState.value.typedText.length) {
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
-                    eventTime = timeProvider.getElapsedRealtime(),
-                    screenOrientation = screenOrientationProvider.getCurrentOrientation(),
                     username = _uiState.value.userName
                 )
 

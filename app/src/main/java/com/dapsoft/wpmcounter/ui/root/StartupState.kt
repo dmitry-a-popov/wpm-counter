@@ -1,4 +1,4 @@
-package com.dapsoft.wpmcounter.ui.root.state
+package com.dapsoft.wpmcounter.ui.root
 
 /**
  * Represents the navigation state of the application during startup.

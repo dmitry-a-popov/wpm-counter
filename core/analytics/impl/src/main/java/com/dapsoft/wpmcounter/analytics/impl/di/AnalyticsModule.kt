@@ -23,6 +23,8 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionStateStore
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionUpdater
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionUpdaterImpl
+import com.dapsoft.wpmcounter.common.TimeProvider
+import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.logger.Logger
 
 import dagger.Module
@@ -78,9 +80,15 @@ object AnalyticsModule {
 
     @Provides
     internal fun provideTrackKeyPressUseCase(
-        behavioralAnalyticsRepository: BehavioralAnalyticsRepository
+        behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
+        screenOrientationProvider: ScreenOrientationProvider,
+        timeProvider: TimeProvider
     ): TrackKeyPressUseCase {
-        return TrackKeyPressUseCaseImpl(behavioralAnalyticsRepository)
+        return TrackKeyPressUseCaseImpl(
+            behavioralAnalyticsRepository,
+            screenOrientationProvider,
+            timeProvider
+        )
     }
 
     @Provides

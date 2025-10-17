@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.dapsoft.wpmcounter.login.navigation.LoginRoute
 import com.dapsoft.wpmcounter.typing.navigation.TypingRoute
 import com.dapsoft.wpmcounter.ui.AppNavHost
-import com.dapsoft.wpmcounter.ui.root.state.StartupState
+import com.dapsoft.wpmcounter.ui.root.StartupState
 import com.dapsoft.wpmcounter.user.UserRepository
 
 import dagger.hilt.android.lifecycle.HiltViewModel

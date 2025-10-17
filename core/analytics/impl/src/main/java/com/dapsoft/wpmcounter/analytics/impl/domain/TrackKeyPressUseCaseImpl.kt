@@ -2,24 +2,23 @@ package com.dapsoft.wpmcounter.analytics.impl.domain
 
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeystrokeEvent
-import com.dapsoft.wpmcounter.common.orientation.ScreenOrientation
-
-import kotlin.time.Duration
+import com.dapsoft.wpmcounter.common.TimeProvider
+import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 
 internal class TrackKeyPressUseCaseImpl(
-    private val behavioralAnalyticsRepository: BehavioralAnalyticsRepository
+    private val behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
+    private val screenOrientationProvider: ScreenOrientationProvider,
+    private val timeProvider: TimeProvider
 ) : TrackKeyPressUseCase {
 
     override suspend fun invoke(
         symbol: Char,
-        eventTime: Duration,
-        screenOrientation: ScreenOrientation,
         username: String
     ) {
         val keystrokeEvent = KeystrokeEvent(
-            eventTime = eventTime,
+            eventTime = timeProvider.getElapsedRealtime(),
             symbol = symbol,
-            screenOrientation = screenOrientation,
+            screenOrientation = screenOrientationProvider.getCurrentOrientation(),
             username = username
         )
         behavioralAnalyticsRepository.saveEvent(keystrokeEvent)
