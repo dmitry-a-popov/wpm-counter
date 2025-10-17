@@ -10,8 +10,8 @@ import com.dapsoft.wpmcounter.common.WordCounter
 import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.logger.Logger
-import com.dapsoft.wpmcounter.typing.domain.GetCurrentWordIndicesUseCase
-import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCase
+import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
+import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
 import com.dapsoft.wpmcounter.typing.ui.InputState
 import com.dapsoft.wpmcounter.typing.ui.TextMarker
@@ -33,11 +33,11 @@ internal class TypingViewModel @Inject constructor(
     private val getUserNameUseCase: GetUserNameUseCase,
     private val saveUserNameUseCase: SaveUserNameUseCase,
     private val getSampleTextUseCase: GetSampleTextUseCase,
-    private val getMistakeIndicesUseCase: GetMistakeIndicesUseCase,
     private val clearEventsUseCase: ClearEventsUseCase,
     private val trackKeyPressUseCase: TrackKeyPressUseCase,
     private val getTypingSpeedUseCase: GetTypingSpeedUseCase,
-    private val getCurrentWordIndicesUseCase: GetCurrentWordIndicesUseCase,
+    private val currentWordIndicesCalculator: CurrentWordIndicesCalculator,
+    private val mistakeIndicesCalculator: MistakeIndicesCalculator,
     private val screenOrientationProvider: ScreenOrientationProvider,
     private val wordCounter: WordCounter,
     private val timeProvider: TimeProvider,
@@ -72,7 +72,7 @@ internal class TypingViewModel @Inject constructor(
                 getSampleTextUseCase().collect { sampleText ->
                     _uiState.value = _uiState.value.copy(
                         sampleText = sampleText,
-                        currentWordIndices = getCurrentWordIndicesUseCase(sampleText, 0)
+                        currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
                     )
                     wordValidator.init(sampleText)
                     getTypingSpeedUseCase(wordValidator).collect { speedState ->
@@ -107,11 +107,11 @@ internal class TypingViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     typedText = intent.text,
-                    mistakeIndices = getMistakeIndicesUseCase(
+                    mistakeIndices = mistakeIndicesCalculator.calculate(
                         _uiState.value.sampleText,
                         intent.text
                     ),
-                    currentWordIndices = getCurrentWordIndicesUseCase(
+                    currentWordIndices = currentWordIndicesCalculator.calculate(
                         _uiState.value.sampleText,
                         currentWordNumber
                     )

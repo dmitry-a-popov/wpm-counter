@@ -1,8 +1,8 @@
 package com.dapsoft.wpmcounter.typing.domain
 
-class GetMistakeIndicesUseCaseImpl : GetMistakeIndicesUseCase {
+class MistakeIndicesCalculatorImpl : MistakeIndicesCalculator {
 
-    override fun invoke(sampleText: String, typedText: String): List<Pair<Int, Int>> {
+    override fun calculate(sampleText: String, typedText: String): List<Pair<Int, Int>> {
         val typedWords = mutableListOf<Pair<String, Pair<Int, Int>>>()
         var wordStart = -1
 

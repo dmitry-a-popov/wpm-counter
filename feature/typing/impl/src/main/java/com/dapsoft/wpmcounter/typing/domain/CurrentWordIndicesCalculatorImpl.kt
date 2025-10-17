@@ -1,8 +1,8 @@
 package com.dapsoft.wpmcounter.typing.domain
 
-class GetCurrentWordIndicesUseCaseImpl : GetCurrentWordIndicesUseCase {
+class CurrentWordIndicesCalculatorImpl : CurrentWordIndicesCalculator {
 
-    override fun invoke(typedText: String, wordNumber: Int): Pair<Int, Int> {
+    override fun calculate(typedText: String, wordNumber: Int): Pair<Int, Int> {
         var currentWord = 0
         var start = -1
 

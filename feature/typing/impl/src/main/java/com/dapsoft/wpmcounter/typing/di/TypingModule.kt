@@ -1,10 +1,10 @@
 package com.dapsoft.wpmcounter.typing.di
 
 import com.dapsoft.wpmcounter.typing.data.SampleTextRepositoryImpl
-import com.dapsoft.wpmcounter.typing.domain.GetCurrentWordIndicesUseCase
-import com.dapsoft.wpmcounter.typing.domain.GetCurrentWordIndicesUseCaseImpl
-import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCase
-import com.dapsoft.wpmcounter.typing.domain.GetMistakeIndicesUseCaseImpl
+import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
+import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculatorImpl
+import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
+import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculatorImpl
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCase
 import com.dapsoft.wpmcounter.typing.domain.GetSampleTextUseCaseImpl
 import com.dapsoft.wpmcounter.typing.domain.SampleTextRepository
@@ -31,13 +31,13 @@ object TypingModule {
     }
 
     @Provides
-    internal fun provideGetMistakeIndicesUseCase(): GetMistakeIndicesUseCase {
-        return GetMistakeIndicesUseCaseImpl()
+    internal fun provideMistakeIndicesCalculator(): MistakeIndicesCalculator {
+        return MistakeIndicesCalculatorImpl()
     }
 
     @Provides
-    internal fun provideGetCurrentWordIndicesUseCase(
-    ): GetCurrentWordIndicesUseCase {
-        return GetCurrentWordIndicesUseCaseImpl()
+    internal fun provideCurrentWordIndicesCalculator(
+    ): CurrentWordIndicesCalculator {
+        return CurrentWordIndicesCalculatorImpl()
     }
 }
