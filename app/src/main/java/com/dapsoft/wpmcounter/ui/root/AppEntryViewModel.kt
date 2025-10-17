@@ -3,11 +3,14 @@ package com.dapsoft.wpmcounter.ui.root
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
+import com.dapsoft.wpmcounter.login.navigation.LoginRoute
+import com.dapsoft.wpmcounter.typing.navigation.TypingRoute
 import com.dapsoft.wpmcounter.user.UserRepository
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -18,16 +21,14 @@ class AppEntryViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    val startupState = userRepository.name
+    val startDestination = userRepository.name
         .map { name ->
-            when {
-                name.isBlank() -> StartupState.UserRequired
-                else -> StartupState.UserAvailable
-            }
+            if (name.isBlank()) LoginRoute.ROUTE else TypingRoute.ROUTE
         }
+        .distinctUntilChanged()
         .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            StartupState.Loading
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
         )
 }
