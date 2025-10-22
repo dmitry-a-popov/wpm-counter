@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
+import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
 import com.dapsoft.wpmcounter.common.WordCounter
 import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.logger.Logger
@@ -72,14 +73,26 @@ internal class TypingViewModel @Inject constructor(
                     )
                     wordValidator.init(sampleText)
                     getTypingSpeedUseCase(wordValidator).collect { speedState ->
-                        _uiState.value = _uiState.value.copy(
-                            wordsPerMinute = speedState.wordsPerMinute
-                        )
-
-                        if (_uiState.value.inputState != InputState.COMPLETED) {
-                            _uiState.value = _uiState.value.copy(
-                                inputState = if (speedState.isActive) InputState.ACTIVE else InputState.PAUSED
-                            )
+                        when {
+                            _uiState.value.inputState == InputState.COMPLETED -> {
+                                // Do nothing if completed
+                            }
+                            speedState is TypingSpeedState.Error -> {
+                                _uiState.value = _uiState.value.copy(
+                                    inputState = InputState.ERROR
+                                )
+                            }
+                            speedState is TypingSpeedState.Active -> {
+                                _uiState.value = _uiState.value.copy(
+                                    inputState = InputState.ACTIVE,
+                                    wordsPerMinute = speedState.wordsPerMinute
+                                )
+                            }
+                            speedState is TypingSpeedState.Inactive -> {
+                                _uiState.value = _uiState.value.copy(
+                                    inputState = InputState.PAUSED
+                                )
+                            }
                         }
                     }
                 }
@@ -94,8 +107,13 @@ internal class TypingViewModel @Inject constructor(
             is UiIntent.ChangeTypedText -> if (intent.text.length > _uiState.value.typedText.length) {
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
-                    username = _uiState.value.userName
-                )
+                    userName = _uiState.value.userName
+                ).onFailure {
+                    log.e(TAG, "Failed to track key press: ${it.stackTraceToString()}")
+                    _uiState.value = _uiState.value.copy(
+                        inputState = InputState.ERROR
+                    )
+                }
 
                 val currentWordNumber = wordCounter.count(intent.text) - 1 + if (intent.text.lastOrNull()?.isWhitespace() == true) 1 else 0
 
@@ -124,14 +142,14 @@ internal class TypingViewModel @Inject constructor(
     }
 
     private suspend fun clearState() {
-        clearEventsUseCase()
+        val newInputState = if (clearEventsUseCase().isSuccess) InputState.PAUSED else InputState.ERROR
         wordValidator.init(_uiState.value.sampleText)
         _uiState.value = _uiState.value.copy(
             typedText = "",
             currentWordIndices = Pair(0, 0),
             mistakeIndices = emptyList(),
             wordsPerMinute = 0f,
-            inputState = InputState.PAUSED
+            inputState = newInputState
         )
     }
 

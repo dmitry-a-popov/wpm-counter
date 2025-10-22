@@ -12,9 +12,9 @@ internal class TypingSessionUpdaterImpl(private val typingSessionStateStore: Typ
         val currentState = typingSessionStateStore.state
 
         val newTimestamp = timestamp
-        val timeDiff = if (currentState.timestamp.inWholeMilliseconds == 0L) 0.milliseconds else timestamp.minus(currentState.timestamp)
+        val timeDiff = if (currentState.lastEventTimestamp.inWholeMilliseconds == 0L) 0.milliseconds else timestamp.minus(currentState.lastEventTimestamp)
         val isWithinPauseThreshold = timeDiff < pauseThreshold
-        val newTotalActiveTypingTimeMillis = if (isWithinPauseThreshold) currentState.totalActiveTypingTimeMillis + timeDiff else currentState.totalActiveTypingTimeMillis
+        val newTotalActiveTypingTimeMillis = if (isWithinPauseThreshold) currentState.totalActiveTypingTime + timeDiff else currentState.totalActiveTypingTime
 
         var nextWord = currentState.currentWord
         var newValidWordCount = currentState.validWordCount
@@ -31,8 +31,8 @@ internal class TypingSessionUpdaterImpl(private val typingSessionStateStore: Typ
         }
 
         val nextState = SessionState(
-            timestamp = newTimestamp,
-            totalActiveTypingTimeMillis = newTotalActiveTypingTimeMillis,
+            lastEventTimestamp = newTimestamp,
+            totalActiveTypingTime = newTotalActiveTypingTimeMillis,
             validWordCount = newValidWordCount,
             currentWord = nextWord
         )

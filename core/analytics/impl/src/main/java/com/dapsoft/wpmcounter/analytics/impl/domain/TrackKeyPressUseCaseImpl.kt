@@ -4,23 +4,36 @@ import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeystrokeEvent
 import com.dapsoft.wpmcounter.common.TimeProvider
 import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
+import com.dapsoft.wpmcounter.logger.Logger
+
+import kotlin.coroutines.cancellation.CancellationException
 
 internal class TrackKeyPressUseCaseImpl(
     private val behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
     private val screenOrientationProvider: ScreenOrientationProvider,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val log: Logger
 ) : TrackKeyPressUseCase {
 
     override suspend fun invoke(
         symbol: Char,
-        username: String
-    ) {
+        userName: String
+    ) = runCatching {
         val keystrokeEvent = KeystrokeEvent(
             eventTime = timeProvider.getElapsedRealtime(),
             symbol = symbol,
             screenOrientation = screenOrientationProvider.getCurrentOrientation(),
-            username = username
+            userName = userName
         )
         behavioralAnalyticsRepository.saveEvent(keystrokeEvent)
+    }.onFailure { exception ->
+        log.e(TAG, exception.stackTraceToString())
+        if (exception is CancellationException) {
+            throw exception
+        }
+    }
+
+    private companion object {
+        private val TAG = TrackKeyPressUseCaseImpl::class.java.simpleName
     }
 }

@@ -14,16 +14,11 @@ import kotlinx.coroutines.flow.map
  */
 internal class BehavioralAnalyticsRepositoryImpl(
     private val dataSource: BehavioralAnalyticsDataSource,
-    private val mapper: KeystrokeEventMapper,
-    private val log: Logger
+    private val mapper: KeystrokeEventMapper
 ) : BehavioralAnalyticsRepository {
 
     override suspend fun saveEvent(event: KeystrokeEvent) {
-        try {
-            dataSource.saveKeystrokeEventEntity(mapper.toEntity(event))
-        } catch (e: Exception) {
-            log.e(TAG, "Failed to save event: ${event.symbol}", e)
-        }
+        dataSource.saveKeystrokeEventEntity(mapper.toEntity(event))
     }
 
     override fun getLatestEvent(): Flow<KeystrokeEvent?> {
@@ -33,14 +28,6 @@ internal class BehavioralAnalyticsRepositoryImpl(
     }
 
     override suspend fun deleteAllEvents() {
-        try {
-            dataSource.deleteAllKeystrokeEventEntities()
-        } catch (e: Exception) {
-            log.e(TAG, "Failed to delete all events", e)
-        }
-    }
-
-    companion object {
-        private val TAG = BehavioralAnalyticsRepositoryImpl::class.java.simpleName
+        dataSource.deleteAllKeystrokeEventEntities()
     }
 }

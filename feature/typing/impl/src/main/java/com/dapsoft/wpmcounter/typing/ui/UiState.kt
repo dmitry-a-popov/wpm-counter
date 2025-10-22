@@ -10,9 +10,10 @@ internal data class UiState(
     val inputState: InputState
 )
 
-enum class InputState {
+internal enum class InputState {
     ACTIVE,
     PAUSED,
+    ERROR,
     COMPLETED;
 
     val isInputEnabled: Boolean
@@ -22,6 +23,7 @@ enum class InputState {
         get() = when (this) {
             ACTIVE -> "Active"
             PAUSED -> "Paused"
+            ERROR -> "Error"
             COMPLETED -> "Completed"
         }
 }

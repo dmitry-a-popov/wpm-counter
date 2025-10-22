@@ -16,7 +16,7 @@ import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.BehavioralAnalytics
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeystrokeEventMapper
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeystrokeEventMapperImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.BehavioralAnalyticsRepository
-import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventUseCaseImpl
+import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventsUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.GetTypingSpeedUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.SpeedCalculator
 import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
@@ -64,30 +64,32 @@ object AnalyticsModule {
     @Provides
     internal fun provideBehavioralAnalyticsRepository(
         dataSource: BehavioralAnalyticsDataSource,
-        mapper: KeystrokeEventMapper,
-        log: Logger
+        mapper: KeystrokeEventMapper
     ): BehavioralAnalyticsRepository {
-        return BehavioralAnalyticsRepositoryImpl(dataSource, mapper, log)
+        return BehavioralAnalyticsRepositoryImpl(dataSource, mapper)
     }
 
     @Provides
     internal fun provideClearEventsUseCase(
         behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
-        typingSessionStateStore: TypingSessionStateStore
+        typingSessionStateStore: TypingSessionStateStore,
+        log: Logger
     ): ClearEventsUseCase {
-        return ClearEventUseCaseImpl(behavioralAnalyticsRepository, typingSessionStateStore)
+        return ClearEventsUseCaseImpl(behavioralAnalyticsRepository, typingSessionStateStore, log)
     }
 
     @Provides
     internal fun provideTrackKeyPressUseCase(
         behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
         screenOrientationProvider: ScreenOrientationProvider,
-        timeProvider: TimeProvider
+        timeProvider: TimeProvider,
+        log: Logger
     ): TrackKeyPressUseCase {
         return TrackKeyPressUseCaseImpl(
             behavioralAnalyticsRepository,
             screenOrientationProvider,
-            timeProvider
+            timeProvider,
+            log
         )
     }
 
