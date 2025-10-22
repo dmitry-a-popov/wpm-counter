@@ -41,7 +41,7 @@ internal class GetTypingSpeedUseCaseImpl(
                                 flow {
                                     emit(activeState)
                                     delay(PAUSE_THRESHOLD)
-                                    emit(TypingSpeedState.Inactive)
+                                    emit(TypingSpeedState.Paused)
                                 }
 
                             }

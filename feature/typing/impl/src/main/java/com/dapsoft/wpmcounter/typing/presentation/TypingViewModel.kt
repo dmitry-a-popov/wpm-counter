@@ -88,7 +88,7 @@ internal class TypingViewModel @Inject constructor(
                                     wordsPerMinute = speedState.wordsPerMinute
                                 )
                             }
-                            speedState is TypingSpeedState.Inactive -> {
+                            speedState is TypingSpeedState.Paused -> {
                                 _uiState.value = _uiState.value.copy(
                                     inputState = InputState.PAUSED
                                 )
