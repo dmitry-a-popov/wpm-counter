@@ -1,10 +1,13 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain
 
 import com.dapsoft.wpmcounter.logger.Logger
+
+import javax.inject.Inject
+
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
-internal class SpeedCalculatorImpl(private val log: Logger) : SpeedCalculator {
+internal class SpeedCalculatorImpl @Inject constructor(private val log: Logger) : SpeedCalculator {
 
     override fun calculateWordsPerMinute(validWordsCount: Int, activeTimeMillis: Duration): Float {
         val activeTimeMinutes = maxOf(

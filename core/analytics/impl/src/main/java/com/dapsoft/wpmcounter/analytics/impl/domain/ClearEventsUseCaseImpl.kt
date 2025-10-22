@@ -3,6 +3,8 @@ package com.dapsoft.wpmcounter.analytics.impl.domain
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.logger.Logger
 
+import javax.inject.Inject
+
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -12,7 +14,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * Failure policy: session state is not reset if event deletion fails,
  * preventing inconsistent "mixed" state.
  */
-internal class ClearEventsUseCaseImpl(
+internal class ClearEventsUseCaseImpl @Inject constructor(
     private val behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
     private val typingSessionStateStore: TypingSessionStateStore,
     private val log: Logger

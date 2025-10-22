@@ -23,7 +23,7 @@ internal enum class InputState {
         get() = when (this) {
             ACTIVE -> "Active"
             PAUSED -> "Paused"
-            ERROR -> "Error"
+            ERROR -> "Internal Error, Please restart"
             COMPLETED -> "Completed"
         }
 }

@@ -23,10 +23,8 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionStateStore
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionUpdater
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionUpdaterImpl
-import com.dapsoft.wpmcounter.common.TimeProvider
-import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
-import com.dapsoft.wpmcounter.logger.Logger
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,91 +35,64 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AnalyticsModule {
+abstract class AnalyticsModule {
 
-    @Provides
-    @Singleton
-    internal fun provideAnalyticsDatabase(@ApplicationContext context: Context): AnalyticsDatabase {
-        return Room.databaseBuilder(
-            context,
-            AnalyticsDatabase::class.java,
-            "analytics_database"
-        ).build()
-    }
+    @Binds
+    internal abstract fun bindBehavioralAnalyticsDataSource(
+        impl: BehavioralAnalyticsDatabaseDataSource
+    ): BehavioralAnalyticsDataSource
 
-    @Provides
-    internal fun provideBehavioralAnalyticsDataSource(
-        database: AnalyticsDatabase
-    ): BehavioralAnalyticsDataSource {
-        return BehavioralAnalyticsDatabaseDataSource(database)
-    }
+    @Binds
+    internal abstract fun bindKeystrokeEventMapper(
+        impl: KeystrokeEventMapperImpl
+    ) : KeystrokeEventMapper
 
-    @Provides
-    internal fun provideKeystrokeEventMapper() : KeystrokeEventMapper {
-        return KeystrokeEventMapperImpl()
-    }
+    @Binds
+    internal abstract fun bindBehavioralAnalyticsRepository(
+        impl: BehavioralAnalyticsRepositoryImpl
+    ): BehavioralAnalyticsRepository
 
-    @Provides
-    internal fun provideBehavioralAnalyticsRepository(
-        dataSource: BehavioralAnalyticsDataSource,
-        mapper: KeystrokeEventMapper
-    ): BehavioralAnalyticsRepository {
-        return BehavioralAnalyticsRepositoryImpl(dataSource, mapper)
-    }
+    @Binds
+    internal abstract fun bindClearEventsUseCase(
+        impl: ClearEventsUseCaseImpl
+    ): ClearEventsUseCase
 
-    @Provides
-    internal fun provideClearEventsUseCase(
-        behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
-        typingSessionStateStore: TypingSessionStateStore,
-        log: Logger
-    ): ClearEventsUseCase {
-        return ClearEventsUseCaseImpl(behavioralAnalyticsRepository, typingSessionStateStore, log)
-    }
+    @Binds
+    internal abstract fun bindTrackKeyPressUseCase(
+        impl: TrackKeyPressUseCaseImpl
+    ): TrackKeyPressUseCase
 
-    @Provides
-    internal fun provideTrackKeyPressUseCase(
-        behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
-        screenOrientationProvider: ScreenOrientationProvider,
-        timeProvider: TimeProvider,
-        log: Logger
-    ): TrackKeyPressUseCase {
-        return TrackKeyPressUseCaseImpl(
-            behavioralAnalyticsRepository,
-            screenOrientationProvider,
-            timeProvider,
-            log
-        )
-    }
+    @Binds
+    internal abstract fun bindTypingSessionStateStore(
+        inMemoryTypingSessionStateStore: InMemoryTypingSessionStateStore
+    ): TypingSessionStateStore
 
-    @Provides
-    @Singleton
-    internal fun provideTypingSessionStateStore(): TypingSessionStateStore {
-        return InMemoryTypingSessionStateStore()
-    }
 
-    @Provides
-    internal fun provideGetTypingSpeedUseCase(
-        analyticsRepo: BehavioralAnalyticsRepository,
-        speedCalculator: SpeedCalculator,
-        typingSessionUpdater: TypingSessionUpdater,
-        log: Logger
-    ): GetTypingSpeedUseCase {
-        return GetTypingSpeedUseCaseImpl(
-            analyticsRepo,
-            speedCalculator,
-            typingSessionUpdater,
-            log
-        )
-    }
+    @Binds
+    internal abstract fun bindGetTypingSpeedUseCase(
+        impl: GetTypingSpeedUseCaseImpl
+    ): GetTypingSpeedUseCase
 
-    @Provides
-    internal fun provideSpeedCalculator(log: Logger): SpeedCalculator {
-        return SpeedCalculatorImpl(log)
-    }
+    @Binds
+    internal abstract fun bindSpeedCalculator(
+        impl: SpeedCalculatorImpl
+    ): SpeedCalculator
 
-    @Provides
-    internal fun provideTypingSessionUpdater(typingSessionStateStore: TypingSessionStateStore): TypingSessionUpdater {
-        return TypingSessionUpdaterImpl(typingSessionStateStore)
+    @Binds
+    internal abstract fun bindTypingSessionUpdater(
+        impl: TypingSessionUpdaterImpl
+    ): TypingSessionUpdater
 
+    companion object {
+        @Provides
+        @Singleton
+        internal fun provideAnalyticsDatabase(
+            @ApplicationContext context: Context
+        ): AnalyticsDatabase =
+            Room.databaseBuilder(
+                context,
+                AnalyticsDatabase::class.java,
+                "analytics_database"
+            ).build()
     }
 }

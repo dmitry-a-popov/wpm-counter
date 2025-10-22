@@ -3,18 +3,35 @@ package com.dapsoft.wpmcounter.analytics.impl.domain
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.SessionState
 import com.dapsoft.wpmcounter.common.validation.WordValidator
 
+import javax.inject.Inject
+
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-internal class TypingSessionUpdaterImpl(private val typingSessionStateStore: TypingSessionStateStore) : TypingSessionUpdater {
+internal class TypingSessionUpdaterImpl @Inject constructor(
+    private val typingSessionStateStore: TypingSessionStateStore
+) : TypingSessionUpdater {
 
-    override fun onEvent(symbol: Char, timestamp: Duration, pauseThreshold: Duration, validator: WordValidator) : SessionState {
+    override fun onEvent(
+        symbol: Char,
+        timestamp: Duration,
+        pauseThreshold: Duration,
+        validator: WordValidator
+    ) : SessionState {
         val currentState = typingSessionStateStore.state
 
         val newTimestamp = timestamp
-        val timeDiff = if (currentState.lastEventTimestamp.inWholeMilliseconds == 0L) 0.milliseconds else timestamp.minus(currentState.lastEventTimestamp)
+        val timeDiff = if (currentState.lastEventTimestamp.inWholeMilliseconds == 0L) {
+            0.milliseconds
+        } else {
+            timestamp.minus(currentState.lastEventTimestamp)
+        }
         val isWithinPauseThreshold = timeDiff < pauseThreshold
-        val newTotalActiveTypingTimeMillis = if (isWithinPauseThreshold) currentState.totalActiveTypingTime + timeDiff else currentState.totalActiveTypingTime
+        val newTotalActiveTypingTimeMillis = if (isWithinPauseThreshold) {
+            currentState.totalActiveTypingTime + timeDiff
+        } else {
+            currentState.totalActiveTypingTime
+        }
 
         var nextWord = currentState.currentWord
         var newValidWordCount = currentState.validWordCount

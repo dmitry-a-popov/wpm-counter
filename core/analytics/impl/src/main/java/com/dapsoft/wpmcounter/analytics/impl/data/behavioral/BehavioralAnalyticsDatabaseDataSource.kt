@@ -5,10 +5,14 @@ import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.database.KeystrokeE
 
 import kotlinx.coroutines.flow.Flow
 
+import javax.inject.Inject
+import javax.inject.Singleton
+
 /**
  * Database implementation of [BehavioralAnalyticsDataSource] using Room.
  */
-internal class BehavioralAnalyticsDatabaseDataSource (
+@Singleton
+internal class BehavioralAnalyticsDatabaseDataSource @Inject constructor (
     private val database: AnalyticsDatabase
 ) : BehavioralAnalyticsDataSource {
 
