@@ -1,6 +1,13 @@
 package com.dapsoft.wpmcounter.common.orientation
 
+/**
+ * Provides a snapshot of the current screen orientation at call time.
+ */
 interface ScreenOrientationProvider {
 
-    fun getCurrentOrientation(): ScreenOrientation
+    /**
+     * Returns the current orientation. May be [ScreenOrientation.Undefined] if the system
+     * cannot determine orientation yet.
+     */
+    val currentOrientation: ScreenOrientation
 }

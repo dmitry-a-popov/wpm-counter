@@ -25,7 +25,7 @@ internal class TrackKeyPressUseCaseImpl @Inject constructor(
         val keystrokeEvent = KeystrokeEvent(
             eventTime = timeProvider.getElapsedRealtime(),
             symbol = symbol,
-            screenOrientation = screenOrientationProvider.getCurrentOrientation(),
+            screenOrientation = screenOrientationProvider.currentOrientation,
             userName = userName
         )
         behavioralAnalyticsRepository.saveEvent(keystrokeEvent)
