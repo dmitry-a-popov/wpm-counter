@@ -1,6 +1,9 @@
 package com.dapsoft.wpmcounter.common.validation
 
+/**
+ * Compares typed text against sample text word by word.
+ */
 interface TextValidator {
 
-    fun checkText(sampleText: String, text: String): List<Boolean>
+    fun compareWords(sampleText: String, typedText: String): List<WordComparison>
 }

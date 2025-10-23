@@ -1,8 +1,8 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain
 
 import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
-import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
+import com.dapsoft.wpmcounter.common.validation.TextValidator
 import com.dapsoft.wpmcounter.logger.Logger
 
 import javax.inject.Inject
@@ -29,16 +29,17 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
     private val analyticsRepo: BehavioralAnalyticsRepository,
     private val speedCalculator: SpeedCalculator,
     private val sessionUpdater: TypingSessionUpdater,
+    private val textValidator: TextValidator,
     private val log: Logger
 ) : GetTypingSpeedUseCase {
 
     override fun invoke(
-        validator: WordValidator,
+        sampleText: String,
         pauseThreshold: Duration
     ): Flow<TypingSpeedState> =
         analyticsRepo.getLatestEvent()
             .filterNotNull()
-            .map { event -> toActiveState(event.symbol, event.eventTime, pauseThreshold, validator) }
+            .map { event -> toActiveState(event.symbol, event.eventTime, pauseThreshold, sampleText) }
             .flatMapLatest { activeState ->
                 flow {
                     emit(activeState)
@@ -61,12 +62,12 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
         symbol: Char,
         eventTime: Duration,
         pauseThreshold: Duration,
-        validator: WordValidator
+        sampleText: String
     ): TypingSpeedState.Active {
-        val sessionState = sessionUpdater.updateForKeystroke(symbol, eventTime, pauseThreshold, validator)
+        val sessionState = sessionUpdater.updateForKeystroke(symbol, eventTime, pauseThreshold)
         log.d(TAG, "Session state: $sessionState")
         val wpm = speedCalculator.calculateWordsPerMinute(
-            sessionState.validWordCount,
+            textValidator.compareWords(sampleText, sessionState.currentText).count { it.matches },
             sessionState.totalActiveTypingTime
         )
         return TypingSpeedState.Active(wordsPerMinute = wpm)

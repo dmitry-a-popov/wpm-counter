@@ -1,16 +1,17 @@
 package com.dapsoft.wpmcounter.typing.domain
 
-class MistakeIndicesCalculatorImpl : MistakeIndicesCalculator {
+import com.dapsoft.wpmcounter.common.validation.TextValidator
+
+internal class MistakeIndicesCalculatorImpl(private val textValidator: TextValidator) : MistakeIndicesCalculator {
 
     override fun calculate(sampleText: String, typedText: String): List<Pair<Int, Int>> {
-        val typedWords = mutableListOf<Pair<String, Pair<Int, Int>>>()
+        val typedWordIntervals = mutableListOf<Pair<Int, Int>>()
         var wordStart = -1
 
         for (i in typedText.indices) {
-            val char = typedText[i]
-            if (char.isWhitespace()) {
+            if (typedText[i].isWhitespace()) {
                 if (wordStart != -1) {
-                    typedWords.add(Pair(typedText.substring(wordStart, i), Pair(wordStart, i)))
+                    typedWordIntervals.add(wordStart to i)
                     wordStart = -1
                 }
             } else if (wordStart == -1) {
@@ -19,31 +20,15 @@ class MistakeIndicesCalculatorImpl : MistakeIndicesCalculator {
         }
 
         if (wordStart != -1) {
-            typedWords.add(Pair(typedText.substring(wordStart), Pair(wordStart, typedText.length)))
+            typedWordIntervals.add(wordStart to typedText.length)
         }
 
-        val sampleWords = sampleText.split(Regex("\\s+")).filter { it.isNotEmpty() }
+        val comparisons = textValidator.compareWords(sampleText, typedText)
 
-        if (typedWords.isEmpty()) {
-            return emptyList()
-        }
-
-        val mistakeIntervals = mutableListOf<Pair<Int, Int>>()
-
-        val minSize = minOf(sampleWords.size, typedWords.size)
-        for (i in 0 until minSize) {
-            if (typedWords[i].first != sampleWords[i]) {
-                mistakeIntervals.add(typedWords[i].second)
-            }
-        }
-
-        if (typedWords.size > sampleWords.size) {
-            for (i in sampleWords.size until typedWords.size) {
-                mistakeIntervals.add(typedWords[i].second)
-            }
-        }
-
-        return mistakeIntervals
+        return typedWordIntervals
+            .zip(comparisons)
+            .filter { (_, comparison) -> !comparison.matches }
+            .map { (interval, _) -> interval }
     }
 
 }

@@ -1,7 +1,6 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain
 
 import com.dapsoft.wpmcounter.analytics.impl.domain.model.SessionState
-import com.dapsoft.wpmcounter.common.validation.WordValidator
 
 import javax.inject.Inject
 
@@ -15,8 +14,7 @@ internal class TypingSessionUpdaterImpl @Inject constructor(
     override fun updateForKeystroke(
         symbol: Char,
         timestamp: Duration,
-        pauseThreshold: Duration,
-        validator: WordValidator
+        pauseThreshold: Duration
     ) : SessionState {
         require(pauseThreshold > Duration.ZERO)
 
@@ -27,8 +25,7 @@ internal class TypingSessionUpdaterImpl @Inject constructor(
                 current,
                 symbol,
                 timestamp,
-                pauseThreshold,
-                validator
+                pauseThreshold
             )
             nextState
         }
@@ -39,30 +36,19 @@ internal class TypingSessionUpdaterImpl @Inject constructor(
         current: SessionState,
         symbol: Char,
         timestamp: Duration,
-        pauseThreshold: Duration,
-        validator: WordValidator
+        pauseThreshold: Duration
     ): SessionState {
         val isFirstEvent = current.lastEventTimestamp.inWholeMilliseconds == 0L
         val timeDiff = if (isFirstEvent) 0.milliseconds else timestamp - current.lastEventTimestamp
         val withinThreshold = timeDiff < pauseThreshold
         val newTotalActive = if (withinThreshold) current.totalActiveTypingTime + timeDiff else current.totalActiveTypingTime
 
-        var word = current.currentWord
-        var validCount = current.validWordCount
-        if (symbol.isWhitespace()) {
-            if (word.isNotEmpty()) {
-                if (validator.isValid(word)) validCount += 1
-                word = ""
-            }
-        } else {
-            word += symbol
-        }
+        val newText = current.currentText + symbol
 
         return SessionState(
             lastEventTimestamp = timestamp,
             totalActiveTypingTime = newTotalActive,
-            validWordCount = validCount,
-            currentWord = word
+            currentText = newText
         )
     }
 }

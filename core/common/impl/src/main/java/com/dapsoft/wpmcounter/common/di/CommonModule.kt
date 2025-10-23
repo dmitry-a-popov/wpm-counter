@@ -10,9 +10,6 @@ import com.dapsoft.wpmcounter.common.WordCounterImpl
 import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.common.validation.TextValidator
 import com.dapsoft.wpmcounter.common.validation.TextValidatorImpl
-import com.dapsoft.wpmcounter.common.validation.WordValidator
-import com.dapsoft.wpmcounter.common.validation.WordValidatorImpl
-import com.dapsoft.wpmcounter.logger.Logger
 
 import dagger.Module
 import dagger.Provides
@@ -37,13 +34,8 @@ object CommonModule {
     }
 
     @Provides
-    internal fun provideWordValidator(log: Logger): WordValidator {
-        return WordValidatorImpl(log)
-    }
-
-    @Provides
-    internal fun provideTextValidator(wordValidator: WordValidator): TextValidator {
-        return TextValidatorImpl(wordValidator)
+    internal fun provideTextValidator(): TextValidator {
+        return TextValidatorImpl()
     }
 
     @Provides

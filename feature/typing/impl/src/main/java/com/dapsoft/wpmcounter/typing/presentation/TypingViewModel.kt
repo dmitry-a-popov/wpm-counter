@@ -7,7 +7,6 @@ import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
 import com.dapsoft.wpmcounter.common.WordCounter
-import com.dapsoft.wpmcounter.common.validation.WordValidator
 import com.dapsoft.wpmcounter.logger.Logger
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
@@ -38,7 +37,6 @@ internal class TypingViewModel @Inject constructor(
     private val currentWordIndicesCalculator: CurrentWordIndicesCalculator,
     private val mistakeIndicesCalculator: MistakeIndicesCalculator,
     private val wordCounter: WordCounter,
-    private val wordValidator: WordValidator,
     val textMarker: TextMarker,
     val log: Logger
 ) : BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(
@@ -71,8 +69,7 @@ internal class TypingViewModel @Inject constructor(
                         sampleText = sampleText,
                         currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
                     )
-                    wordValidator.init(sampleText)
-                    getTypingSpeedUseCase(wordValidator).collect { speedState ->
+                    getTypingSpeedUseCase(sampleText).collect { speedState ->
                         when {
                             _uiState.value.inputState == InputState.COMPLETED -> {
                                 // Do nothing if completed
@@ -143,7 +140,6 @@ internal class TypingViewModel @Inject constructor(
 
     private suspend fun clearState() {
         val newInputState = if (clearEventsUseCase().isSuccess) InputState.PAUSED else InputState.ERROR
-        wordValidator.init(_uiState.value.sampleText)
         _uiState.value = _uiState.value.copy(
             typedText = "",
             currentWordIndices = Pair(0, 0),

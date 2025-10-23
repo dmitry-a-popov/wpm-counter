@@ -1,5 +1,6 @@
 package com.dapsoft.wpmcounter.typing.di
 
+import com.dapsoft.wpmcounter.common.validation.TextValidator
 import com.dapsoft.wpmcounter.typing.data.SampleTextRepositoryImpl
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculatorImpl
@@ -22,8 +23,8 @@ object TypingModule {
     }
 
     @Provides
-    internal fun provideMistakeIndicesCalculator(): MistakeIndicesCalculator {
-        return MistakeIndicesCalculatorImpl()
+    internal fun provideMistakeIndicesCalculator(textValidator: TextValidator): MistakeIndicesCalculator {
+        return MistakeIndicesCalculatorImpl(textValidator)
     }
 
     @Provides
