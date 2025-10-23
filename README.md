@@ -24,7 +24,7 @@ The codebase is organized into three layers:
 Within features, presentation uses a lightweight MVI approach (`UiState`, `UiIntent`, one-time events, base ViewModel support).
 
 ## 2025 Technology Stack (All Present in Source)
-- Kotlin (JVM target 11)
+- Kotlin (JVM target 17)
 - Jetpack Compose UI (Material 3, previews, BOM)
 - Navigation Compose
 - Hilt for Dependency Injection (with KSP-based code generation)
@@ -32,7 +32,7 @@ Within features, presentation uses a lightweight MVI approach (`UiState`, `UiInt
 - AndroidX DataStore (user name storage)
 - Modular multi-module Gradle setup (API/impl split, version catalogs via `libs.versions.toml`)
 - MVI-style state management helpers (custom `BaseMviViewModel`, one-time event flow)
-- Android SDK: compileSdk = 35, targetSdk = 35, minSdk = 24
+- Android SDK: compileSdk = 36, targetSdk = 36, minSdk = 24
 - Kotlin KSP (Hilt & Room processors)
 - AndroidX Core KTX, Lifecycle Runtime, Activity Compose
 - Logging abstraction (`Logger` + implementation)
@@ -142,13 +142,13 @@ Implements analytics domain logic: use case implementations (`TrackKeyPressUseCa
 
 # Module: core:common:api
 ## Purpose
-Provides shared domain/service abstractions: word counting (`WordCounter`), screen orientation access (`ScreenOrientationProvider`, `ScreenOrientation`), time sourcing (`TimeProvider`), text and word validation (`WordValidator`, `TextValidator`, `WordStatus`).
+Provides shared domain/service abstractions: word counting (`WordCounter`), screen orientation access (`ScreenOrientationProvider`, `ScreenOrientation`), time sourcing (`TimeProvider`), text validation (`TextValidator`, `WordComparisom`).
 ## Dependencies on Other Modules
 (None)
 
 # Module: core:common:impl
 ## Purpose
-Concrete implementations of common services: `WordCounterImpl`, `WordValidatorImpl`, `TextValidatorImpl`, `SystemTimeProvider`, `ScreenOrientationProviderImpl`, plus DI setup (`CommonModule`).
+Concrete implementations of common services: `WordCounterImpl`, `TextValidatorImpl`, `SystemTimeProvider`, `ScreenOrientationProviderImpl`, plus DI setup (`CommonModule`).
 ## Dependencies on Other Modules
 - :core:common:api
 - :core:logger:api
