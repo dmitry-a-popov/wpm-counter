@@ -119,7 +119,7 @@ Implements Typing feature domain + UI:
 - :core:logger:api
 - :core:ui-common
 - :core:user:api
-- 
+
 ---
 
 ## Core Layer
