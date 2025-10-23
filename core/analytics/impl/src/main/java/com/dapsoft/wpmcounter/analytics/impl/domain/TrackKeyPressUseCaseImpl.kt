@@ -5,6 +5,7 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeystrokeEvent
 import com.dapsoft.wpmcounter.common.TimeProvider
 import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.logger.Logger
+
 import javax.inject.Inject
 
 import kotlin.coroutines.cancellation.CancellationException
@@ -20,6 +21,7 @@ internal class TrackKeyPressUseCaseImpl @Inject constructor(
         symbol: Char,
         userName: String
     ) = runCatching {
+        require(!userName.isBlank())
         val keystrokeEvent = KeystrokeEvent(
             eventTime = timeProvider.getElapsedRealtime(),
             symbol = symbol,

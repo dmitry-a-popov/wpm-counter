@@ -12,8 +12,17 @@ import kotlin.time.Duration
  * @property currentWord Characters typed since last whitespace; empty when between words.
  */
 internal data class SessionState(
-    val lastEventTimestamp: Duration = Duration.ZERO,
-    val totalActiveTypingTime: Duration = Duration.ZERO,
-    val validWordCount: Int = 0,
-    val currentWord: String = ""
-)
+    val lastEventTimestamp: Duration,
+    val totalActiveTypingTime: Duration,
+    val validWordCount: Int,
+    val currentWord: String
+) {
+    companion object {
+        fun initial() = SessionState(
+            lastEventTimestamp = Duration.ZERO,
+            totalActiveTypingTime = Duration.ZERO,
+            validWordCount = 0,
+            currentWord = ""
+        )
+    }
+}

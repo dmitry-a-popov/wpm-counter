@@ -12,18 +12,18 @@ import javax.inject.Singleton
 @Singleton
 internal class InMemoryTypingSessionStateStore @Inject constructor() : TypingSessionStateStore {
 
-    private var _state: SessionState = SessionState()
+    private var _state: SessionState = SessionState.initial()
 
-    override var state: SessionState
+    override val state: SessionState
         get() {
             return _state
         }
-        set(value) {
-            _state = value
-        }
 
-    override fun reset() {
-        _state = SessionState()
+    override fun update(transform: (SessionState) -> SessionState) {
+        _state = transform(_state)
     }
 
+    override fun reset() {
+        update { SessionState.initial() }
+    }
 }

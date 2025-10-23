@@ -12,48 +12,57 @@ internal class TypingSessionUpdaterImpl @Inject constructor(
     private val typingSessionStateStore: TypingSessionStateStore
 ) : TypingSessionUpdater {
 
-    override fun onEvent(
+    override fun updateForKeystroke(
         symbol: Char,
         timestamp: Duration,
         pauseThreshold: Duration,
         validator: WordValidator
     ) : SessionState {
-        val currentState = typingSessionStateStore.state
+        require(pauseThreshold > Duration.ZERO)
 
-        val newTimestamp = timestamp
-        val timeDiff = if (currentState.lastEventTimestamp.inWholeMilliseconds == 0L) {
-            0.milliseconds
-        } else {
-            timestamp.minus(currentState.lastEventTimestamp)
+        var nextState = typingSessionStateStore.state
+
+        typingSessionStateStore.update { current ->
+            nextState = computeNextState(
+                current,
+                symbol,
+                timestamp,
+                pauseThreshold,
+                validator
+            )
+            nextState
         }
-        val isWithinPauseThreshold = timeDiff < pauseThreshold
-        val newTotalActiveTypingTimeMillis = if (isWithinPauseThreshold) {
-            currentState.totalActiveTypingTime + timeDiff
-        } else {
-            currentState.totalActiveTypingTime
-        }
+        return nextState
+    }
 
-        var nextWord = currentState.currentWord
-        var newValidWordCount = currentState.validWordCount
+    private fun computeNextState(
+        current: SessionState,
+        symbol: Char,
+        timestamp: Duration,
+        pauseThreshold: Duration,
+        validator: WordValidator
+    ): SessionState {
+        val isFirstEvent = current.lastEventTimestamp.inWholeMilliseconds == 0L
+        val timeDiff = if (isFirstEvent) 0.milliseconds else timestamp - current.lastEventTimestamp
+        val withinThreshold = timeDiff < pauseThreshold
+        val newTotalActive = if (withinThreshold) current.totalActiveTypingTime + timeDiff else current.totalActiveTypingTime
 
+        var word = current.currentWord
+        var validCount = current.validWordCount
         if (symbol.isWhitespace()) {
-            if (nextWord.isNotEmpty()) {
-                if (validator.isValid(nextWord)) {
-                    newValidWordCount += 1
-                }
-                nextWord = ""
+            if (word.isNotEmpty()) {
+                if (validator.isValid(word)) validCount += 1
+                word = ""
             }
         } else {
-            nextWord += symbol
+            word += symbol
         }
 
-        val nextState = SessionState(
-            lastEventTimestamp = newTimestamp,
-            totalActiveTypingTime = newTotalActiveTypingTimeMillis,
-            validWordCount = newValidWordCount,
-            currentWord = nextWord
+        return SessionState(
+            lastEventTimestamp = timestamp,
+            totalActiveTypingTime = newTotalActive,
+            validWordCount = validCount,
+            currentWord = word
         )
-        typingSessionStateStore.state = nextState
-        return nextState
     }
 }

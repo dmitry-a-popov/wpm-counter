@@ -10,7 +10,7 @@ package com.dapsoft.wpmcounter.analytics.speed
  *
  */
 sealed interface TypingSpeedState {
-    data class Active(val wordsPerMinute: Float) : TypingSpeedState
+    data class Active(val wordsPerMinute: Double) : TypingSpeedState
     object Paused : TypingSpeedState
     object Error : TypingSpeedState
 }

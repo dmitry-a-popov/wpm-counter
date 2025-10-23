@@ -6,7 +6,7 @@ internal data class UiState(
     val currentWordIndices: Pair<Int, Int>,
     val typedText: String,
     val mistakeIndices: List<Pair<Int, Int>>,
-    val wordsPerMinute: Float,
+    val wordsPerMinute: Double,
     val inputState: InputState
 )
 

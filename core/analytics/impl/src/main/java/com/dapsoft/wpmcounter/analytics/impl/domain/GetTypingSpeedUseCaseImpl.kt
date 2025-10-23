@@ -63,7 +63,7 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
         pauseThreshold: Duration,
         validator: WordValidator
     ): TypingSpeedState.Active {
-        val sessionState = sessionUpdater.onEvent(symbol, eventTime, pauseThreshold, validator)
+        val sessionState = sessionUpdater.updateForKeystroke(symbol, eventTime, pauseThreshold, validator)
         log.d(TAG, "Session state: $sessionState")
         val wpm = speedCalculator.calculateWordsPerMinute(
             sessionState.validWordCount,
