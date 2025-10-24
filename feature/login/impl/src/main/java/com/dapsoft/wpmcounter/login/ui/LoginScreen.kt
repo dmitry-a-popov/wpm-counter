@@ -20,8 +20,8 @@ import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
 
 @Composable
 internal fun LoginScreen(
-    onLoginConfirmed: (String) -> Unit,
-    vm: LoginViewModel
+    vm: LoginViewModel,
+    onLoginConfirmed: (String) -> Unit
 ) {
     val uiState = vm.uiState.collectAsState().value
 
