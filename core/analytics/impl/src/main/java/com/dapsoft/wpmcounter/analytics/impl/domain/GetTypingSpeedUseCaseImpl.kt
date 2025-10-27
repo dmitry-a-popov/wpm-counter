@@ -19,12 +19,15 @@ import kotlinx.coroutines.flow.onEach
 
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Emits `TypingSpeedState.Active` on each valid keystroke and switches to `TypingSpeedState.Paused`
  * if no events arrive within `pauseThreshold`. Emits `TypingSpeedState.Error` on non\-cancellation failures
  * but keeps the stream alive.
  */
+@OptIn(ExperimentalTime::class)
 internal class GetTypingSpeedUseCaseImpl @Inject constructor(
     private val analyticsRepo: BehavioralAnalyticsRepository,
     private val speedCalculator: SpeedCalculator,
@@ -36,8 +39,10 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
     override fun invoke(
         sampleText: String,
         pauseThreshold: Duration
-    ): Flow<TypingSpeedState> =
-        analyticsRepo.getLatestEvent()
+    ): Flow<TypingSpeedState> {
+        require(pauseThreshold > Duration.ZERO)
+
+        return analyticsRepo.getLatestEvent()
             .filterNotNull()
             .map { event -> toActiveState(event.symbol, event.eventTime, pauseThreshold, sampleText) }
             .flatMapLatest { activeState ->
@@ -57,10 +62,11 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
                 log.e(TAG, "Failed inside typing speed flow: ${exception.stackTraceToString()}")
                 emit(TypingSpeedState.Error)
             }
+    }
 
     private fun toActiveState(
         symbol: Char,
-        eventTime: Duration,
+        eventTime: Instant,
         pauseThreshold: Duration,
         sampleText: String
     ): TypingSpeedState.Active {

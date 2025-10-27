@@ -9,6 +9,7 @@ import com.dapsoft.wpmcounter.logger.Logger
 import javax.inject.Inject
 
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.ExperimentalTime
 
 internal class TrackKeyPressUseCaseImpl @Inject constructor(
     private val behavioralAnalyticsRepository: BehavioralAnalyticsRepository,
@@ -17,13 +18,14 @@ internal class TrackKeyPressUseCaseImpl @Inject constructor(
     private val log: Logger
 ) : TrackKeyPressUseCase {
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun invoke(
         symbol: Char,
         userName: String
     ) = runCatching {
         require(!userName.isBlank())
         val keystrokeEvent = KeystrokeEvent(
-            eventTime = timeProvider.getElapsedRealtime(),
+            eventTime = timeProvider.now(),
             symbol = symbol,
             screenOrientation = screenOrientationProvider.currentOrientation,
             userName = userName

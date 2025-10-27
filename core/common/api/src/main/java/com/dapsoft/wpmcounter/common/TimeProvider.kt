@@ -1,8 +1,10 @@
 package com.dapsoft.wpmcounter.common
 
-import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 interface TimeProvider {
 
-    fun getElapsedRealtime(): Duration
+    @OptIn(ExperimentalTime::class)
+    fun now(): Instant
 }

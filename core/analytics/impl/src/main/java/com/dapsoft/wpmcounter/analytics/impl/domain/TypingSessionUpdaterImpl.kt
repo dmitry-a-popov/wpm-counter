@@ -5,15 +5,17 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.model.SessionState
 import javax.inject.Inject
 
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 internal class TypingSessionUpdaterImpl @Inject constructor(
     private val typingSessionStateStore: TypingSessionStateStore
 ) : TypingSessionUpdater {
 
     override fun updateForKeystroke(
         symbol: Char,
-        timestamp: Duration,
+        timestamp: Instant,
         pauseThreshold: Duration
     ) : SessionState {
         require(pauseThreshold > Duration.ZERO)
@@ -35,20 +37,18 @@ internal class TypingSessionUpdaterImpl @Inject constructor(
     private fun computeNextState(
         current: SessionState,
         symbol: Char,
-        timestamp: Duration,
+        timestamp: Instant,
         pauseThreshold: Duration
     ): SessionState {
-        val isFirstEvent = current.lastEventTimestamp.inWholeMilliseconds == 0L
-        val timeDiff = if (isFirstEvent) 0.milliseconds else timestamp - current.lastEventTimestamp
+        val isFirstEvent = current.lastEventTimestamp == null
+        val timeDiff = if (isFirstEvent) Duration.ZERO else timestamp - current.lastEventTimestamp
         val withinThreshold = timeDiff < pauseThreshold
         val newTotalActive = if (withinThreshold) current.totalActiveTypingTime + timeDiff else current.totalActiveTypingTime
-
-        val newText = current.currentText + symbol
 
         return SessionState(
             lastEventTimestamp = timestamp,
             totalActiveTypingTime = newTotalActive,
-            currentText = newText
+            currentText = current.currentText + symbol
         )
     }
 }

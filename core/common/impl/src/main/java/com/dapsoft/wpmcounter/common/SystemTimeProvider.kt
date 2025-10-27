@@ -1,11 +1,12 @@
 package com.dapsoft.wpmcounter.common
 
-import android.os.SystemClock
+import kotlin.time.Clock
 
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class SystemTimeProvider : TimeProvider {
 
-    override fun getElapsedRealtime(): Duration = SystemClock.elapsedRealtime().milliseconds
+    @OptIn(ExperimentalTime::class)
+    override fun now(): Instant = Clock.System.now()
 }
