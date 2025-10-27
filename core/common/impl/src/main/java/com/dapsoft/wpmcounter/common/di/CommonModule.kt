@@ -11,6 +11,7 @@ import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.common.validation.TextValidator
 import com.dapsoft.wpmcounter.common.validation.TextValidatorImpl
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,27 +20,17 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object CommonModule {
+abstract class CommonModule {
 
-    @Provides
-    internal fun provideTimeProvider() : TimeProvider {
-        return SystemTimeProvider()
-    }
+    @Binds
+    internal abstract fun bindTimeProvider(impl: SystemTimeProvider) : TimeProvider
 
-    @Provides
-    internal fun provideScreenOrientationProvider(
-        @ApplicationContext context: Context
-    ): ScreenOrientationProvider {
-        return ScreenOrientationProviderImpl(context)
-    }
+    @Binds
+    internal abstract fun bindScreenOrientationProvider(impl: ScreenOrientationProviderImpl): ScreenOrientationProvider
 
-    @Provides
-    internal fun provideTextValidator(): TextValidator {
-        return TextValidatorImpl()
-    }
+    @Binds
+    internal abstract fun provideTextValidator(impl: TextValidatorImpl): TextValidator
 
-    @Provides
-    internal fun provideWordCounter(): WordCounter {
-        return WordCounterImpl()
-    }
+    @Binds
+    internal abstract fun provideWordCounter(impl: WordCounterImpl): WordCounter
 }
