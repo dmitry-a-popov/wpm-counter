@@ -5,6 +5,9 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
+/**
+ * System implementation using wall clock time.
+ */
 class SystemTimeProvider : TimeProvider {
 
     @OptIn(ExperimentalTime::class)
