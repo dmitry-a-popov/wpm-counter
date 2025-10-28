@@ -6,8 +6,8 @@ import androidx.navigation.NavHostController
 
 import com.dapsoft.wpmcounter.login.navigation.LoginRoute
 import com.dapsoft.wpmcounter.typing.navigation.TypingRoute
-import com.dapsoft.wpmcounter.login.navigation.loginScreen
-import com.dapsoft.wpmcounter.typing.navigation.typingScreen
+import com.dapsoft.wpmcounter.login.navigation.registerLoginDestination
+import com.dapsoft.wpmcounter.typing.navigation.registerTypingDestination
 
 /**
  * Main navigation host for the application
@@ -20,14 +20,14 @@ fun AppNavHost(
     startDestination: String
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
-        loginScreen(
+        registerLoginDestination(
             onLoginConfirmed = {
                 navController.navigate(TypingRoute.ROUTE) {
                     popUpTo(LoginRoute.ROUTE) { inclusive = true }
                 }
             }
         )
-        typingScreen(
+        registerTypingDestination(
             onLogout = {
                 navController.navigate(LoginRoute.ROUTE) {
                     popUpTo(0) { inclusive = true }

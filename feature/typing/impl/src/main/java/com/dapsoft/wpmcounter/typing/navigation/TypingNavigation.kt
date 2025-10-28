@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 
 import com.dapsoft.wpmcounter.typing.ui.TypingScreen
 
-fun NavGraphBuilder.typingScreen(
+fun NavGraphBuilder.registerTypingDestination(
     onLogout: () -> Unit
 ) {
     composable(TypingRoute.ROUTE) { backStackEntry ->
