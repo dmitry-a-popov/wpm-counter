@@ -22,6 +22,7 @@ object LoggerModule {
         @ApplicationContext context: Context
     ): Logger {
         val debuggable = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        // In debug builds, log everything. In release builds, log warnings and errors only. This logic could be extended later with build parameter.
         val minLevel = if (debuggable) LogLevel.VERBOSE else LogLevel.WARN
         return LoggerImpl(minLevel)
     }
