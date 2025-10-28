@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 import javax.inject.Inject
+import javax.inject.Singleton
 
 internal val Context.userPreferences: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
@@ -25,6 +26,7 @@ internal val Context.userPreferences: DataStore<Preferences> by preferencesDataS
  *
  * Thread safety: DataStore handles its own synchronization; calls here are safe.
  */
+@Singleton
 internal class UserDataStoreDataSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {

@@ -5,6 +5,7 @@ import com.dapsoft.wpmcounter.user.data.UserDataStoreDataSource
 import com.dapsoft.wpmcounter.user.UserRepository
 import com.dapsoft.wpmcounter.user.data.UserRepositoryImpl
 import com.dapsoft.wpmcounter.user.domain.SaveUserNameUseCaseImpl
+import dagger.Binds
 
 import dagger.Module
 import dagger.Provides
@@ -13,19 +14,15 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object UserModule {
+abstract class UserModule {
 
-    @Provides
-    internal fun provideUserRepository(
-        userDataStoreDataSource: UserDataStoreDataSource
-    ): UserRepository {
-        return UserRepositoryImpl(userDataStoreDataSource)
-    }
+    @Binds
+    internal abstract fun bindUserRepository(
+        impl: UserRepositoryImpl
+    ): UserRepository
 
-    @Provides
-    internal fun provideSaveUserNameUseCase(
-        userRepository: UserRepository
-    ): SaveUserNameUseCase {
-        return SaveUserNameUseCaseImpl(userRepository)
-    }
+    @Binds
+    internal abstract fun bindSaveUserNameUseCase(
+        impl: SaveUserNameUseCaseImpl
+    ): SaveUserNameUseCase
 }
