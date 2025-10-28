@@ -55,7 +55,9 @@ internal class TypingViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 userRepository.observeUserName().collect { userName ->
-                    if (userName.isNotEmpty()) {
+                    if (userName == null) {
+                        sendEvent(OneTimeEvent.LeaveScreen)
+                    } else {
                         setState {
                             it.copy(userName = userName)
                         }
@@ -168,7 +170,6 @@ internal class TypingViewModel @Inject constructor(
     private suspend fun changeUser() {
         clearState()
         userRepository.clearUserName()
-        sendEvent(OneTimeEvent.LeaveScreen)
     }
 
     companion object {

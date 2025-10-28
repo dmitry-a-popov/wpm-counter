@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
  */
 internal class UserRepositoryImpl(private val userDataStoreDataSource: UserDataStoreDataSource) : UserRepository {
 
-    override fun observeUserName(): Flow<String> = userDataStoreDataSource.observeUserName()
+    override fun observeUserName(): Flow<String?> = userDataStoreDataSource.observeUserName()
 
     override suspend fun saveUserName(name: String) {
         userDataStoreDataSource.saveUserName(name)
     }
 
     override suspend fun clearUserName() {
-        userDataStoreDataSource.saveUserName("")
+        userDataStoreDataSource.clearUserName()
     }
 }

@@ -23,7 +23,7 @@ class AppEntryViewModel @Inject constructor(
 
     val startDestination = userRepository.observeUserName()
         .map { name ->
-            if (name.isBlank()) LoginRoute.ROUTE else TypingRoute.ROUTE
+            if (name.isNullOrBlank()) LoginRoute.ROUTE else TypingRoute.ROUTE
         }
         .distinctUntilChanged()
         .stateIn(
