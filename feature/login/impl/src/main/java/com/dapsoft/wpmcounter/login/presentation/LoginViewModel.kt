@@ -1,7 +1,5 @@
 package com.dapsoft.wpmcounter.login.presentation
 
-import androidx.lifecycle.viewModelScope
-
 import com.dapsoft.wpmcounter.logger.Logger
 import com.dapsoft.wpmcounter.logger.d
 import com.dapsoft.wpmcounter.login.ui.OneTimeEvent
@@ -12,8 +10,6 @@ import com.dapsoft.wpmcounter.user.SaveUserNameUseCase
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
-import kotlinx.coroutines.launch
-
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,17 +18,15 @@ internal class LoginViewModel @Inject constructor(
     private val log: Logger
 ) : BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(UiState("")) {
 
-    override fun processIntent(intent: UiIntent) = viewModelScope.launch {
+    override suspend fun reduce(intent: UiIntent) {
         log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
-            is UiIntent.ChangeUserName -> _uiState.emit(UiState(intent.name))
-            UiIntent.ConfirmLogin -> confirm()
+            is UiIntent.ChangeUserName -> setState { it.copy(userName = intent.name) }
+            is UiIntent.ConfirmLogin -> {
+                saveUserNameUseCase(uiState.value.userName.trim())
+                sendEvent(OneTimeEvent.LeaveScreen)
+            }
         }
-    }
-
-    private suspend fun confirm() {
-        saveUserNameUseCase(uiState.value.userName.trim())
-        _oneTimeEvent.emit(OneTimeEvent.LeaveScreen)
     }
 
     companion object {

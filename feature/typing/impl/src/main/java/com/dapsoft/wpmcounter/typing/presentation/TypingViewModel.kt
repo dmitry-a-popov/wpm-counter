@@ -58,39 +58,47 @@ internal class TypingViewModel @Inject constructor(
             launch {
                 userRepository.name.collect { userName ->
                     if (userName.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(
-                            userName = userName
-                        )
+                        setState {
+                            it.copy(userName = userName)
+                        }
                     }
                 }
             }
 
             launch {
                 sampleTextRepository.text.collect { sampleText ->
-                    _uiState.value = _uiState.value.copy(
-                        sampleText = sampleText,
-                        currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
-                    )
+                    setState {
+                        it.copy(
+                            sampleText = sampleText,
+                            currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
+                        )
+                    }
                     getTypingSpeedUseCase(sampleText).collect { speedState ->
                         when {
-                            _uiState.value.inputState == InputState.COMPLETED -> {
+                            uiState.value.inputState == InputState.COMPLETED -> {
                                 // Do nothing if completed
                             }
                             speedState is TypingSpeedState.Error -> {
-                                _uiState.value = _uiState.value.copy(
-                                    inputState = InputState.ERROR
-                                )
+                                setState {
+                                    it.copy(
+                                        inputState = InputState.ERROR
+                                    )
+                                }
                             }
                             speedState is TypingSpeedState.Active -> {
-                                _uiState.value = _uiState.value.copy(
-                                    inputState = InputState.ACTIVE,
-                                    wordsPerMinute = speedState.wordsPerMinute
-                                )
+                                setState {
+                                    it.copy(
+                                        inputState = InputState.ACTIVE,
+                                        wordsPerMinute = speedState.wordsPerMinute
+                                    )
+                                }
                             }
                             speedState is TypingSpeedState.Paused -> {
-                                _uiState.value = _uiState.value.copy(
-                                    inputState = InputState.PAUSED
-                                )
+                                setState {
+                                    it.copy(
+                                        inputState = InputState.PAUSED
+                                    )
+                                }
                             }
                         }
                     }
@@ -99,41 +107,47 @@ internal class TypingViewModel @Inject constructor(
         }
     }
 
-    override fun processIntent(intent: UiIntent) = viewModelScope.launch {
+    override suspend fun reduce(intent: UiIntent) {
         log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
             UiIntent.ChangeUser -> changeUser()
-            is UiIntent.ChangeTypedText -> if (intent.text.length > _uiState.value.typedText.length) {
+            is UiIntent.ChangeTypedText -> if (intent.text.length > uiState.value.typedText.length) {
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
-                    userName = _uiState.value.userName
+                    userName = uiState.value.userName
                 ).onFailure {
                     log.e(TAG, it) { "Error tracking key press for symbol='${intent.text.last()}'" }
-                    _uiState.value = _uiState.value.copy(
-                        inputState = InputState.ERROR
-                    )
+                    setState {
+                        it.copy(
+                            inputState = InputState.ERROR
+                        )
+                    }
                 }
 
                 val currentWordNumber = wordCounter.count(intent.text) - 1 + if (intent.text.lastOrNull()?.isWhitespace() == true) 1 else 0
 
-                _uiState.value = _uiState.value.copy(
-                    typedText = intent.text,
-                    mistakeIndices = mistakeIndicesCalculator.calculate(
-                        _uiState.value.sampleText,
-                        intent.text
-                    ),
-                    currentWordIndices = currentWordIndicesCalculator.calculate(
-                        _uiState.value.sampleText,
-                        currentWordNumber
+                setState {
+                    it.copy(
+                        typedText = intent.text,
+                        mistakeIndices = mistakeIndicesCalculator.calculate(
+                            uiState.value.sampleText,
+                            intent.text
+                        ),
+                        currentWordIndices = currentWordIndicesCalculator.calculate(
+                            uiState.value.sampleText,
+                            currentWordNumber
+                        )
                     )
-                )
+                }
 
-                val sampleTextWordNumber = wordCounter.count(_uiState.value.sampleText)
+                val sampleTextWordNumber = wordCounter.count(uiState.value.sampleText)
 
                 if (currentWordNumber + 1 > sampleTextWordNumber) {
-                    _uiState.value = _uiState.value.copy(
-                        inputState = InputState.COMPLETED
-                    )
+                    setState {
+                        it.copy(
+                            inputState = InputState.COMPLETED
+                        )
+                    }
                 }
             }
             UiIntent.Restart -> clearState()
@@ -142,19 +156,21 @@ internal class TypingViewModel @Inject constructor(
 
     private suspend fun clearState() {
         val newInputState = if (clearEventsUseCase().isSuccess) InputState.PAUSED else InputState.ERROR
-        _uiState.value = _uiState.value.copy(
-            typedText = "",
-            currentWordIndices = Pair(0, 0),
-            mistakeIndices = emptyList(),
-            wordsPerMinute = 0.toDouble(),
-            inputState = newInputState
-        )
+        setState {
+            it.copy(
+                typedText = "",
+                currentWordIndices = Pair(0, 0),
+                mistakeIndices = emptyList(),
+                wordsPerMinute = 0.toDouble(),
+                inputState = newInputState
+            )
+        }
     }
 
     private suspend fun changeUser() {
         clearState()
         saveUserNameUseCase("")
-        _oneTimeEvent.emit(OneTimeEvent.LeaveScreen)
+        sendEvent(OneTimeEvent.LeaveScreen)
     }
 
     companion object {

@@ -10,6 +10,6 @@ fun NavGraphBuilder.typingScreen(
     onLogout: () -> Unit
 ) {
     composable(TypingRoute.ROUTE) { backStackEntry ->
-        TypingScreen(vm = hiltViewModel(backStackEntry), onChangeUser = onLogout)
+        TypingScreen(viewModel = hiltViewModel(backStackEntry), onChangeUser = onLogout)
     }
 }

@@ -20,13 +20,13 @@ import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
 
 @Composable
 internal fun LoginScreen(
-    vm: LoginViewModel,
+    viewModel: LoginViewModel,
     onLoginConfirmed: (String) -> Unit
 ) {
-    val uiState = vm.uiState.collectAsState().value
+    val uiState = viewModel.uiState.collectAsState().value
 
-    LaunchedEffect(key1 = vm) {
-        vm.oneTimeEvent.collect {
+    LaunchedEffect(key1 = viewModel) {
+        viewModel.oneTimeEvent.collect {
             when (it) {
                 is OneTimeEvent.LeaveScreen -> {
                     onLoginConfirmed(uiState.userName)
@@ -43,12 +43,12 @@ internal fun LoginScreen(
         OutlinedTextField(
             value = uiState.userName,
             onValueChange = { newName ->
-                vm.processIntent(UiIntent.ChangeUserName(newName))
+                viewModel.dispatch(UiIntent.ChangeUserName(newName))
             },
             label = { Text("Your name") }
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { vm.processIntent(UiIntent.ConfirmLogin) }, enabled = uiState.userName.isNotBlank()) {
+        Button(onClick = { viewModel.dispatch(UiIntent.ConfirmLogin) }, enabled = uiState.userName.isNotBlank()) {
             Text("Confirm")
         }
     }

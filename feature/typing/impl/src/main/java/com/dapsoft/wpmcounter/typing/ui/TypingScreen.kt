@@ -41,12 +41,12 @@ import com.dapsoft.wpmcounter.typing.presentation.TypingViewModel
 
 @Composable
 internal fun TypingScreen(
-    vm: TypingViewModel,
+    viewModel: TypingViewModel,
     onChangeUser: () -> Unit
 ) {
 
-    LaunchedEffect(key1 = vm) {
-        vm.oneTimeEvent.collect {
+    LaunchedEffect(key1 = viewModel) {
+        viewModel.oneTimeEvent.collect {
             when (it) {
                 is OneTimeEvent.LeaveScreen -> {
                     onChangeUser()
@@ -55,11 +55,11 @@ internal fun TypingScreen(
         }
     }
 
-    val uiState = vm.uiState.collectAsState().value
+    val uiState = viewModel.uiState.collectAsState().value
     val scrollState = rememberScrollState()
 
     val annotatedSampleText = remember(uiState.sampleText, uiState.currentWordIndices) {
-        vm.textMarker.markCurrentWord(uiState.sampleText, uiState.currentWordIndices)
+        viewModel.textMarker.markCurrentWord(uiState.sampleText, uiState.currentWordIndices)
     }
 
     val textFieldValue = TextFieldValue(
@@ -98,7 +98,7 @@ internal fun TypingScreen(
                     text = newValue.text,
                     selection = TextRange(newValue.text.length)
                 )
-                vm.processIntent(UiIntent.ChangeTypedText(forcedEndCursor.text))
+                viewModel.dispatch(UiIntent.ChangeTypedText(forcedEndCursor.text))
             },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -107,7 +107,7 @@ internal fun TypingScreen(
             ),
             visualTransformation = VisualTransformation {
                 TransformedText(
-                    vm.textMarker.markMistakes(uiState.typedText, uiState.mistakeIndices),
+                    viewModel.textMarker.markMistakes(uiState.typedText, uiState.mistakeIndices),
                     OffsetMapping.Identity
                 )
             },
@@ -141,8 +141,8 @@ internal fun TypingScreen(
             }
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { vm.processIntent(UiIntent.ChangeUser) } ) { Text("Change user") }
+        Button(onClick = { viewModel.dispatch(UiIntent.ChangeUser) } ) { Text("Change user") }
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { vm.processIntent(UiIntent.Restart) } ) { Text("Restart") }
+        Button(onClick = { viewModel.dispatch(UiIntent.Restart) } ) { Text("Restart") }
     }
 }
