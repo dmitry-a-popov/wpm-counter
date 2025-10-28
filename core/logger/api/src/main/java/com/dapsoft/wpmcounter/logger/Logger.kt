@@ -1,21 +1,69 @@
 package com.dapsoft.wpmcounter.logger
 
+enum class LogLevel { VERBOSE, DEBUG, INFO, WARN, ERROR, WTF }
+
 interface Logger {
 
-    fun v(tag: String, msg: String)
+    /**
+     * Core logging entry point.
+     *
+     * @param level log severity
+     * @param tag short source tag
+     * @param throwable optional error
+     * @param message lazy message supplier
+     */
+    fun log(
+        level: LogLevel,
+        tag: String,
+        throwable: Throwable? = null,
+        message: () -> String
+    )
+}
 
-    fun d(tag: String, msg: String)
+inline fun Logger.v(
+    tag: String,
+    throwable: Throwable? = null,
+    crossinline message: () -> String
+) {
+    log(LogLevel.VERBOSE, tag, throwable) { message() }
+}
 
-    fun i(tag: String, msg: String)
+inline fun Logger.d(
+    tag: String,
+    throwable: Throwable? = null,
+    crossinline message: () -> String
+) {
+    log(LogLevel.DEBUG, tag, throwable) { message() }
+}
 
-    fun w(tag: String, msg: String)
+inline fun Logger.i(
+    tag: String,
+    throwable: Throwable? = null,
+    crossinline message: () -> String
+) {
+    log(LogLevel.INFO, tag, throwable) { message() }
+}
 
-    fun e(tag: String, msg: String)
+inline fun Logger.w(
+    tag: String,
+    throwable: Throwable? = null,
+    crossinline message: () -> String
+) {
+    log(LogLevel.WARN, tag, throwable) { message() }
+}
 
-    fun e(tag: String, msg: String, err: Throwable)
+inline fun Logger.e(
+    tag: String,
+    throwable: Throwable? = null,
+    crossinline message: () -> String
+) {
+    log(LogLevel.ERROR, tag, throwable) { message() }
+}
 
-    fun wtf(tag: String, msg: String)
-
-    fun wtf(tag: String, msg: String, err: Throwable)
-
+inline fun Logger.wtf(
+    tag: String,
+    throwable: Throwable? = null,
+    crossinline message: () -> String
+) {
+    log(LogLevel.WTF, tag, throwable) { message() }
 }

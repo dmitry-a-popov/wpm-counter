@@ -4,6 +4,8 @@ import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
 import com.dapsoft.wpmcounter.common.validation.TextValidator
 import com.dapsoft.wpmcounter.logger.Logger
+import com.dapsoft.wpmcounter.logger.d
+import com.dapsoft.wpmcounter.logger.e
 
 import javax.inject.Inject
 
@@ -54,12 +56,12 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
             }
             .distinctUntilChanged()
             .onEach {
-                log.d(TAG, "Emitting typing speed state: $it")
+                log.d(TAG) { "Emitting typing speed state: $it" }
             }.catch { exception ->
                 if (exception is CancellationException) {
                     throw exception
                 }
-                log.e(TAG, "Failed inside typing speed flow: ${exception.stackTraceToString()}")
+                log.e(TAG, exception) { "Failed inside typing speed flow" }
                 emit(TypingSpeedState.Error)
             }
     }
@@ -71,7 +73,7 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
         sampleText: String
     ): TypingSpeedState.Active {
         val sessionState = sessionUpdater.updateForKeystroke(symbol, eventTime, pauseThreshold)
-        log.d(TAG, "Session state: $sessionState")
+        log.d(TAG) { "Session state: $sessionState" }
         val wpm = speedCalculator.calculateWordsPerMinute(
             textValidator.compareWords(sampleText, sessionState.currentText).count { it.matches },
             sessionState.totalActiveTypingTime

@@ -5,6 +5,7 @@ import com.dapsoft.wpmcounter.analytics.impl.domain.model.KeystrokeEvent
 import com.dapsoft.wpmcounter.common.TimeProvider
 import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProvider
 import com.dapsoft.wpmcounter.logger.Logger
+import com.dapsoft.wpmcounter.logger.e
 
 import javax.inject.Inject
 
@@ -32,7 +33,7 @@ internal class TrackKeyPressUseCaseImpl @Inject constructor(
         )
         behavioralAnalyticsRepository.saveEvent(keystrokeEvent)
     }.onFailure { exception ->
-        log.e(TAG, exception.stackTraceToString())
+        log.e(TAG, exception) { "Exception during tracking key press: symbol='$symbol', userName='$userName'" }
         if (exception is CancellationException) {
             throw exception
         }

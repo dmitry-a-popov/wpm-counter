@@ -8,6 +8,8 @@ import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
 import com.dapsoft.wpmcounter.common.WordCounter
 import com.dapsoft.wpmcounter.logger.Logger
+import com.dapsoft.wpmcounter.logger.d
+import com.dapsoft.wpmcounter.logger.e
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.SampleTextRepository
@@ -98,7 +100,7 @@ internal class TypingViewModel @Inject constructor(
     }
 
     override fun processIntent(intent: UiIntent) = viewModelScope.launch {
-        log.d(TAG, "Processing intent: $intent")
+        log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
             UiIntent.ChangeUser -> changeUser()
             is UiIntent.ChangeTypedText -> if (intent.text.length > _uiState.value.typedText.length) {
@@ -106,7 +108,7 @@ internal class TypingViewModel @Inject constructor(
                     symbol = intent.text.last(),
                     userName = _uiState.value.userName
                 ).onFailure {
-                    log.e(TAG, "Failed to track key press: ${it.stackTraceToString()}")
+                    log.e(TAG, it) { "Error tracking key press for symbol='${intent.text.last()}'" }
                     _uiState.value = _uiState.value.copy(
                         inputState = InputState.ERROR
                     )

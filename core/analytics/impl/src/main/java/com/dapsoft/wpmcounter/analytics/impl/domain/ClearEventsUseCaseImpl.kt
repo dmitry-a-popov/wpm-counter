@@ -2,6 +2,7 @@ package com.dapsoft.wpmcounter.analytics.impl.domain
 
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
 import com.dapsoft.wpmcounter.logger.Logger
+import com.dapsoft.wpmcounter.logger.e
 
 import javax.inject.Inject
 
@@ -24,7 +25,7 @@ internal class ClearEventsUseCaseImpl @Inject constructor(
         behavioralAnalyticsRepository.deleteAllEvents()
         typingSessionStateStore.reset()
     }.onFailure { exception ->
-        log.e(TAG, exception.stackTraceToString())
+        log.e(TAG, exception) { "Exception during clearing events" }
         if (exception is CancellationException) {
             throw exception
         }

@@ -3,6 +3,7 @@ package com.dapsoft.wpmcounter.login.presentation
 import androidx.lifecycle.viewModelScope
 
 import com.dapsoft.wpmcounter.logger.Logger
+import com.dapsoft.wpmcounter.logger.d
 import com.dapsoft.wpmcounter.login.ui.OneTimeEvent
 import com.dapsoft.wpmcounter.login.ui.UiIntent
 import com.dapsoft.wpmcounter.login.ui.UiState
@@ -22,7 +23,7 @@ internal class LoginViewModel @Inject constructor(
 ) : BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(UiState("")) {
 
     override fun processIntent(intent: UiIntent) = viewModelScope.launch {
-        log.d(TAG, "Processing intent: $intent")
+        log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
             is UiIntent.ChangeUserName -> _uiState.emit(UiState(intent.name))
             UiIntent.ConfirmLogin -> confirm()
