@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 internal interface SampleTextRepository {
 
-    val text: Flow<String>
+    fun observeText(): Flow<String>
 }

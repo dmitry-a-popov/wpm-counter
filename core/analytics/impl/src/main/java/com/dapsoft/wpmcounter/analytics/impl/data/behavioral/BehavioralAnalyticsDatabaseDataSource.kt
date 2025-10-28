@@ -20,8 +20,8 @@ internal class BehavioralAnalyticsDatabaseDataSource @Inject constructor (
         database.keystrokeEventDao().insert(event)
     }
 
-    override fun getLatestKeystrokeEventEntity(): Flow<KeystrokeEventEntity?> {
-        return database.keystrokeEventDao().getLatestEvent()
+    override fun observeLatestKeystrokeEventEntity(): Flow<KeystrokeEventEntity?> {
+        return database.keystrokeEventDao().observeLatestEvent()
     }
 
     override suspend fun deleteAllKeystrokeEventEntities() {

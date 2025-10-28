@@ -24,8 +24,8 @@ internal class BehavioralAnalyticsRepositoryImpl @Inject constructor(
         dataSource.saveKeystrokeEventEntity(mapper.toEntity(event))
     }
 
-    override fun getLatestEvent(): Flow<KeystrokeEvent?> {
-        return dataSource.getLatestKeystrokeEventEntity().map { entity ->
+    override fun observeLatestEvent(): Flow<KeystrokeEvent?> {
+        return dataSource.observeLatestKeystrokeEventEntity().map { entity ->
             entity?.let { mapper.toDomain(it) }
         }
     }

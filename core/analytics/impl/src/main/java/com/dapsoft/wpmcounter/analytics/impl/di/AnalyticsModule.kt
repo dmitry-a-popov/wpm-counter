@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.room.Room
 
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
-import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
+import com.dapsoft.wpmcounter.analytics.speed.ObserveTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.impl.data.InMemoryTypingSessionStateStore
 import com.dapsoft.wpmcounter.analytics.impl.domain.SpeedCalculatorImpl
@@ -17,7 +17,7 @@ import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeystrokeEve
 import com.dapsoft.wpmcounter.analytics.impl.data.behavioral.mapper.KeystrokeEventMapperImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.BehavioralAnalyticsRepository
 import com.dapsoft.wpmcounter.analytics.impl.domain.ClearEventsUseCaseImpl
-import com.dapsoft.wpmcounter.analytics.impl.domain.GetTypingSpeedUseCaseImpl
+import com.dapsoft.wpmcounter.analytics.impl.domain.ObserveTypingSpeedUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.SpeedCalculator
 import com.dapsoft.wpmcounter.analytics.impl.domain.TrackKeyPressUseCaseImpl
 import com.dapsoft.wpmcounter.analytics.impl.domain.TypingSessionStateStore
@@ -69,9 +69,9 @@ abstract class AnalyticsModule {
 
 
     @Binds
-    internal abstract fun bindGetTypingSpeedUseCase(
-        impl: GetTypingSpeedUseCaseImpl
-    ): GetTypingSpeedUseCase
+    internal abstract fun bindObserveTypingSpeedUseCase(
+        impl: ObserveTypingSpeedUseCaseImpl
+    ): ObserveTypingSpeedUseCase
 
     @Binds
     internal abstract fun bindSpeedCalculator(

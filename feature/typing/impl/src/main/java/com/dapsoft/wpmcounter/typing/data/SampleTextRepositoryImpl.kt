@@ -7,8 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 
 class SampleTextRepositoryImpl : SampleTextRepository {
 
-    override val text: Flow<String>
-        get() = flowOf(SAMPLE_TEXT)
+    override fun observeText(): Flow<String> = flowOf(SAMPLE_TEXT)
 
     companion object {
         private val SAMPLE_TEXT = """

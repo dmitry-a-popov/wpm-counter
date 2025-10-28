@@ -24,7 +24,7 @@ internal interface KeystrokeEventDao {
      * Retrieves the most recent keyboard event, if any exists.
      */
     @Query("SELECT * FROM key_events ORDER BY eventTimeMillis DESC LIMIT 1")
-    fun getLatestEvent(): Flow<KeystrokeEventEntity?>
+    fun observeLatestEvent(): Flow<KeystrokeEventEntity?>
 
     /**
      * Deletes all keyboard events from the database.

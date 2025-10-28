@@ -1,6 +1,6 @@
 package com.dapsoft.wpmcounter.analytics.impl.domain
 
-import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
+import com.dapsoft.wpmcounter.analytics.speed.ObserveTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
 import com.dapsoft.wpmcounter.common.validation.TextValidator
 import com.dapsoft.wpmcounter.logger.Logger
@@ -30,13 +30,13 @@ import kotlin.time.Instant
  * but keeps the stream alive.
  */
 @OptIn(ExperimentalTime::class)
-internal class GetTypingSpeedUseCaseImpl @Inject constructor(
+internal class ObserveTypingSpeedUseCaseImpl @Inject constructor(
     private val analyticsRepo: BehavioralAnalyticsRepository,
     private val speedCalculator: SpeedCalculator,
     private val sessionUpdater: TypingSessionUpdater,
     private val textValidator: TextValidator,
     private val log: Logger
-) : GetTypingSpeedUseCase {
+) : ObserveTypingSpeedUseCase {
 
     override fun invoke(
         sampleText: String,
@@ -44,7 +44,7 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
     ): Flow<TypingSpeedState> {
         require(pauseThreshold > Duration.ZERO)
 
-        return analyticsRepo.getLatestEvent()
+        return analyticsRepo.observeLatestEvent()
             .filterNotNull()
             .map { event -> toActiveState(event.symbol, event.eventTime, pauseThreshold, sampleText) }
             .flatMapLatest { activeState ->
@@ -82,6 +82,6 @@ internal class GetTypingSpeedUseCaseImpl @Inject constructor(
     }
 
     companion object {
-        private val TAG = GetTypingSpeedUseCaseImpl::class.java.simpleName
+        private val TAG = ObserveTypingSpeedUseCaseImpl::class.java.simpleName
     }
 }

@@ -23,7 +23,7 @@ internal class LoginViewModel @Inject constructor(
         when (intent) {
             is UiIntent.ChangeUserName -> setState { it.copy(userName = intent.name) }
             is UiIntent.ConfirmLogin -> {
-                saveUserNameUseCase(uiState.value.userName.trim())
+                saveUserNameUseCase(uiState.value.userName)
                 sendEvent(OneTimeEvent.LeaveScreen)
             }
         }

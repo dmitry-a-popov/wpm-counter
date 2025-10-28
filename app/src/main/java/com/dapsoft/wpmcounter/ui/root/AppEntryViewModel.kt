@@ -18,10 +18,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AppEntryViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    userRepository: UserRepository
 ) : ViewModel() {
 
-    val startDestination = userRepository.name
+    val startDestination = userRepository.observeUserName()
         .map { name ->
             if (name.isBlank()) LoginRoute.ROUTE else TypingRoute.ROUTE
         }

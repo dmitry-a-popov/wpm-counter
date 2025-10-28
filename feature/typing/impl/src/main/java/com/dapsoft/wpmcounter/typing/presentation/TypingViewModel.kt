@@ -3,7 +3,7 @@ package com.dapsoft.wpmcounter.typing.presentation
 import androidx.lifecycle.viewModelScope
 
 import com.dapsoft.wpmcounter.analytics.ClearEventsUseCase
-import com.dapsoft.wpmcounter.analytics.speed.GetTypingSpeedUseCase
+import com.dapsoft.wpmcounter.analytics.speed.ObserveTypingSpeedUseCase
 import com.dapsoft.wpmcounter.analytics.TrackKeyPressUseCase
 import com.dapsoft.wpmcounter.analytics.speed.TypingSpeedState
 import com.dapsoft.wpmcounter.common.WordCounter
@@ -19,7 +19,6 @@ import com.dapsoft.wpmcounter.typing.ui.OneTimeEvent
 import com.dapsoft.wpmcounter.typing.ui.UiIntent
 import com.dapsoft.wpmcounter.typing.ui.UiState
 import com.dapsoft.wpmcounter.ui_common.BaseMviViewModel
-import com.dapsoft.wpmcounter.user.SaveUserNameUseCase
 import com.dapsoft.wpmcounter.user.UserRepository
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,10 +31,9 @@ import javax.inject.Inject
 internal class TypingViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val sampleTextRepository: SampleTextRepository,
-    private val saveUserNameUseCase: SaveUserNameUseCase,
     private val clearEventsUseCase: ClearEventsUseCase,
     private val trackKeyPressUseCase: TrackKeyPressUseCase,
-    private val getTypingSpeedUseCase: GetTypingSpeedUseCase,
+    private val observeTypingSpeedUseCase: ObserveTypingSpeedUseCase,
     private val currentWordIndicesCalculator: CurrentWordIndicesCalculator,
     private val mistakeIndicesCalculator: MistakeIndicesCalculator,
     private val wordCounter: WordCounter,
@@ -56,7 +54,7 @@ internal class TypingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                userRepository.name.collect { userName ->
+                userRepository.observeUserName().collect { userName ->
                     if (userName.isNotEmpty()) {
                         setState {
                             it.copy(userName = userName)
@@ -66,14 +64,14 @@ internal class TypingViewModel @Inject constructor(
             }
 
             launch {
-                sampleTextRepository.text.collect { sampleText ->
+                sampleTextRepository.observeText().collect { sampleText ->
                     setState {
                         it.copy(
                             sampleText = sampleText,
                             currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
                         )
                     }
-                    getTypingSpeedUseCase(sampleText).collect { speedState ->
+                    observeTypingSpeedUseCase(sampleText).collect { speedState ->
                         when {
                             uiState.value.inputState == InputState.COMPLETED -> {
                                 // Do nothing if completed
@@ -169,7 +167,7 @@ internal class TypingViewModel @Inject constructor(
 
     private suspend fun changeUser() {
         clearState()
-        saveUserNameUseCase("")
+        userRepository.clearUserName()
         sendEvent(OneTimeEvent.LeaveScreen)
     }
 

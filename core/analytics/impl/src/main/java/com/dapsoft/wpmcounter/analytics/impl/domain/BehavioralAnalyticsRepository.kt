@@ -21,7 +21,7 @@ internal interface BehavioralAnalyticsRepository {
      *
      * @return Flow emitting the latest keystroke event or null if none exists
      */
-    fun getLatestEvent(): Flow<KeystrokeEvent?>
+    fun observeLatestEvent(): Flow<KeystrokeEvent?>
 
     /**
      * Deletes all stored keystroke events.

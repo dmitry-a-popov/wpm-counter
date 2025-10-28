@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-interface GetTypingSpeedUseCase {
+interface ObserveTypingSpeedUseCase {
     /**
      * Calculates typing speed based on validated input from database entries.
      * @param sampleText A reference text
