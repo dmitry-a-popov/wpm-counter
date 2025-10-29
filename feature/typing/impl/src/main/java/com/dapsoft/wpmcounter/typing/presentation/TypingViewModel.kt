@@ -13,11 +13,11 @@ import com.dapsoft.wpmcounter.logger.e
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.SampleTextRepository
-import com.dapsoft.wpmcounter.typing.ui.InputState
+import com.dapsoft.wpmcounter.typing.presentation.InputState
 import com.dapsoft.wpmcounter.typing.ui.TextMarker
-import com.dapsoft.wpmcounter.typing.ui.OneTimeEvent
-import com.dapsoft.wpmcounter.typing.ui.UiIntent
-import com.dapsoft.wpmcounter.typing.ui.UiState
+import com.dapsoft.wpmcounter.typing.presentation.TypingOneTimeEvent
+import com.dapsoft.wpmcounter.typing.presentation.TypingUiIntent
+import com.dapsoft.wpmcounter.typing.presentation.TypingUiState
 import com.dapsoft.wpmcounter.ui_common.BaseMviViewModel
 import com.dapsoft.wpmcounter.user.UserRepository
 
@@ -39,8 +39,8 @@ internal class TypingViewModel @Inject constructor(
     private val wordCounter: WordCounter,
     val textMarker: TextMarker,
     val log: Logger
-) : BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(
-    UiState(
+) : BaseMviViewModel<TypingUiState, TypingUiIntent, TypingOneTimeEvent>(
+    TypingUiState(
         userName = "",
         sampleText = "",
         currentWordIndices = Pair(0, 0),
@@ -56,7 +56,7 @@ internal class TypingViewModel @Inject constructor(
             launch {
                 userRepository.observeUserName().collect { userName ->
                     if (userName == null) {
-                        sendEvent(OneTimeEvent.LeaveScreen)
+                        sendEvent(TypingOneTimeEvent.LeaveScreen)
                     } else {
                         setState {
                             it.copy(userName = userName)
@@ -107,11 +107,11 @@ internal class TypingViewModel @Inject constructor(
         }
     }
 
-    override suspend fun reduce(intent: UiIntent) {
+    override suspend fun reduce(intent: TypingUiIntent) {
         log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
-            UiIntent.ChangeUser -> changeUser()
-            is UiIntent.ChangeTypedText -> if (intent.text.length > uiState.value.typedText.length) {
+            TypingUiIntent.ChangeUser -> changeUser()
+            is TypingUiIntent.ChangeTypedText -> if (intent.text.length > uiState.value.typedText.length) {
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
                     userName = uiState.value.userName
@@ -150,7 +150,7 @@ internal class TypingViewModel @Inject constructor(
                     }
                 }
             }
-            UiIntent.Restart -> clearState()
+            TypingUiIntent.Restart -> clearState()
         }
     }
 

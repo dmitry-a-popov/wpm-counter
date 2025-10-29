@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation(project(":core:user:api"))
+    implementation(project(":core:logger:api"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore.preferences)

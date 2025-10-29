@@ -1,5 +1,7 @@
 package com.dapsoft.wpmcounter.login.ui
 
+import android.widget.Toast
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,23 +15,45 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
+import com.dapsoft.wpmcounter.login.presentation.LoginOneTimeEvent
+import com.dapsoft.wpmcounter.login.presentation.LoginUiIntent
 import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
 
+/**
+ * Login screen (Jetpack Compose) implementing a small MVI loop:
+ *  - Subscribes to [LoginViewModel.uiState] to render the current user name.
+ *  - Dispatches intents to the ViewModel via [LoginViewModel.dispatch] on text change and confirm.
+ *  - Collects single-shot effects from [LoginViewModel.oneTimeEvent] for navigation and transient errors.
+ *
+ * Navigation: on [LoginOneTimeEvent.LeaveScreen] invokes [onLoginConfirmed] with the latest user name.
+ * Errors: on [LoginOneTimeEvent.ShowLoginError] shows a Toast.
+ *
+ * @param viewModel Injected presentation layer ViewModel.
+ * @param onLoginConfirmed Callback to proceed after successful login.
+ */
 @Composable
 internal fun LoginScreen(
     viewModel: LoginViewModel,
     onLoginConfirmed: (String) -> Unit
 ) {
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = viewModel) {
         viewModel.oneTimeEvent.collect {
             when (it) {
-                is OneTimeEvent.LeaveScreen -> {
-                    onLoginConfirmed(uiState.userName)
+                is LoginOneTimeEvent.LeaveScreen -> onLoginConfirmed(uiState.userName)
+                is LoginOneTimeEvent.ShowLoginError -> {
+                    Toast.makeText(
+                        context,
+                        "Error during user name save",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -37,19 +61,18 @@ internal fun LoginScreen(
 
     Column(
         Modifier
-        .windowInsetsPadding(WindowInsets.safeDrawing)
-        .padding(24.dp)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(24.dp)
     ) {
         OutlinedTextField(
             value = uiState.userName,
-            onValueChange = { newName ->
-                viewModel.dispatch(UiIntent.ChangeUserName(newName))
-            },
+            onValueChange = { newName -> viewModel.dispatch(LoginUiIntent.ChangeUserName(newName)) },
             label = { Text("Your name") }
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { viewModel.dispatch(UiIntent.ConfirmLogin) }, enabled = uiState.userName.isNotBlank()) {
-            Text("Confirm")
-        }
+        Button(
+            onClick = { viewModel.dispatch(LoginUiIntent.ConfirmLogin) },
+            enabled = uiState.userName.isNotBlank()
+        ) { Text("Confirm") }
     }
 }

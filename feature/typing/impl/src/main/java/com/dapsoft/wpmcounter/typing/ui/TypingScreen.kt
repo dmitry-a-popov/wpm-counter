@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,6 +37,8 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dapsoft.wpmcounter.typing.presentation.TypingOneTimeEvent
+import com.dapsoft.wpmcounter.typing.presentation.TypingUiIntent
 
 import com.dapsoft.wpmcounter.typing.presentation.TypingViewModel
 
@@ -48,14 +51,14 @@ internal fun TypingScreen(
     LaunchedEffect(key1 = viewModel) {
         viewModel.oneTimeEvent.collect {
             when (it) {
-                is OneTimeEvent.LeaveScreen -> {
+                is TypingOneTimeEvent.LeaveScreen -> {
                     onChangeUser()
                 }
             }
         }
     }
 
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
     val annotatedSampleText = remember(uiState.sampleText, uiState.currentWordIndices) {
@@ -98,7 +101,7 @@ internal fun TypingScreen(
                     text = newValue.text,
                     selection = TextRange(newValue.text.length)
                 )
-                viewModel.dispatch(UiIntent.ChangeTypedText(forcedEndCursor.text))
+                viewModel.dispatch(TypingUiIntent.ChangeTypedText(forcedEndCursor.text))
             },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -141,8 +144,8 @@ internal fun TypingScreen(
             }
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { viewModel.dispatch(UiIntent.ChangeUser) } ) { Text("Change user") }
+        Button(onClick = { viewModel.dispatch(TypingUiIntent.ChangeUser) } ) { Text("Change user") }
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { viewModel.dispatch(UiIntent.Restart) } ) { Text("Restart") }
+        Button(onClick = { viewModel.dispatch(TypingUiIntent.Restart) } ) { Text("Restart") }
     }
 }

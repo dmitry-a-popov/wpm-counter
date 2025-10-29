@@ -2,9 +2,9 @@ package com.dapsoft.wpmcounter.login.presentation
 
 import com.dapsoft.wpmcounter.logger.Logger
 import com.dapsoft.wpmcounter.logger.d
-import com.dapsoft.wpmcounter.login.ui.OneTimeEvent
-import com.dapsoft.wpmcounter.login.ui.UiIntent
-import com.dapsoft.wpmcounter.login.ui.UiState
+import com.dapsoft.wpmcounter.login.presentation.LoginOneTimeEvent
+import com.dapsoft.wpmcounter.login.presentation.LoginUiIntent
+import com.dapsoft.wpmcounter.login.presentation.LoginUiState
 import com.dapsoft.wpmcounter.ui_common.BaseMviViewModel
 import com.dapsoft.wpmcounter.user.SaveUserNameUseCase
 
@@ -12,19 +12,35 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 import javax.inject.Inject
 
+/**
+ * ViewModel for the Login feature implementing a lightweight MVI flow.
+ *
+ * Responsibilities:
+ * - Holds immutable form state via [LoginUiState] (current user name input).
+ * - Processes user/system intents serialized by [BaseMviViewModel]:
+ *   - [LoginUiIntent.ChangeUserName] – updates state with the new input value.
+ *   - [LoginUiIntent.ConfirmLogin] – triggers persistence through [SaveUserNameUseCase].
+ * - Emits one-time events via [LoginOneTimeEvent]:
+ *   - [LoginOneTimeEvent.LeaveScreen] on successful save (navigation to next screen).
+ *   - [LoginOneTimeEvent.ShowLoginError] on validation/persistence failure (transient error signal).
+ *
+ */
 @HiltViewModel
 internal class LoginViewModel @Inject constructor(
     private val saveUserNameUseCase: SaveUserNameUseCase,
     private val log: Logger
-) : BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(UiState("")) {
+) : BaseMviViewModel<LoginUiState, LoginUiIntent, LoginOneTimeEvent>(LoginUiState("")) {
 
-    override suspend fun reduce(intent: UiIntent) {
+    override suspend fun reduce(intent: LoginUiIntent) {
         log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
-            is UiIntent.ChangeUserName -> setState { it.copy(userName = intent.name) }
-            is UiIntent.ConfirmLogin -> {
-                saveUserNameUseCase(uiState.value.userName)
-                sendEvent(OneTimeEvent.LeaveScreen)
+            is LoginUiIntent.ChangeUserName -> setState { it.copy(userName = intent.name) }
+            is LoginUiIntent.ConfirmLogin -> {
+                saveUserNameUseCase(uiState.value.userName).onSuccess {
+                    sendEvent(LoginOneTimeEvent.LeaveScreen)
+                }.onFailure {
+                    sendEvent(LoginOneTimeEvent.ShowLoginError)
+                }
             }
         }
     }

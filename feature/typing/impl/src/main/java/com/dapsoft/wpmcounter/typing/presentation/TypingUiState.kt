@@ -1,6 +1,6 @@
-package com.dapsoft.wpmcounter.typing.ui
+package com.dapsoft.wpmcounter.typing.presentation
 
-internal data class UiState(
+internal data class TypingUiState(
     val userName: String,
     val sampleText: String,
     val currentWordIndices: Pair<Int, Int>,
