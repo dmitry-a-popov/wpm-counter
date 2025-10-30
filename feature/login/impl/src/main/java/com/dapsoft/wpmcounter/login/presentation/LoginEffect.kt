@@ -12,16 +12,16 @@ package com.dapsoft.wpmcounter.login.presentation
  *  - Re-dispatching the same navigation / error after recomposition or configuration changes
  *  - Polluting immutable state with side-effect semantics
  */
-internal sealed class LoginOneTimeEvent {
+internal sealed class LoginEffect {
     /**
      * Indicates the user name was saved successfully and the screen can be left.
      * UI should trigger navigation, using the latest stable state value.
      */
-    object LeaveScreen : LoginOneTimeEvent()
+    object LeaveScreen : LoginEffect()
 
     /**
      * Indicates a validation or persistence error while saving the user name.
      * UI decides how to surface the message (Toast / Snackbar / banner etc.).
      */
-    object ShowLoginError : LoginOneTimeEvent()
+    object ShowLoginError : LoginEffect()
 }

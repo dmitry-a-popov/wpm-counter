@@ -35,11 +35,11 @@ internal class TypingViewModel @Inject constructor(
     private val wordCounter: WordCounter,
     val textMarker: TextMarker,
     val log: Logger
-) : BaseMviViewModel<TypingUiState, TypingUiIntent, TypingOneTimeEvent>(
+) : BaseMviViewModel<TypingUiState, TypingUiIntent, TypingEffect>(
     TypingUiState(
         userName = "",
         sampleText = "",
-        currentWordIndices = Pair(0, 0),
+        currentWordIndices = null,
         typedText = "",
         mistakeIndices = emptyList(),
         wordsPerMinute = 0.toDouble(),
@@ -52,7 +52,7 @@ internal class TypingViewModel @Inject constructor(
             launch {
                 userRepository.observeUserName().collect { userName ->
                     if (userName == null) {
-                        sendEvent(TypingOneTimeEvent.LeaveScreen)
+                        sendSideEffect(TypingEffect.LeaveScreen)
                     } else {
                         setState {
                             it.copy(userName = userName)
@@ -154,7 +154,7 @@ internal class TypingViewModel @Inject constructor(
         setState {
             it.copy(
                 typedText = "",
-                currentWordIndices = Pair(0, 0),
+                currentWordIndices = null,
                 mistakeIndices = emptyList(),
                 wordsPerMinute = 0.toDouble(),
                 inputState = newInputState

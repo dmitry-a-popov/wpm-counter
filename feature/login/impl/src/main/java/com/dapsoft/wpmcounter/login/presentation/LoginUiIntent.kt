@@ -7,7 +7,7 @@ package com.dapsoft.wpmcounter.login.presentation
  *
  * Guidelines:
  *  - Intents are processed one at a time -> simpler reasoning about state transitions.
- *  - They never return a value directly; results are reflected via [LoginUiState] updates or [LoginOneTimeEvent] emissions.
+ *  - They never return a value directly; results are reflected via [LoginUiState] updates or [LoginEffect] emissions.
  */
 internal sealed class LoginUiIntent {
 

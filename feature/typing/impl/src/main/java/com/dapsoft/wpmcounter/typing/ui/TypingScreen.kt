@@ -37,7 +37,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dapsoft.wpmcounter.typing.presentation.TypingOneTimeEvent
+import com.dapsoft.wpmcounter.typing.presentation.TypingEffect
 import com.dapsoft.wpmcounter.typing.presentation.TypingUiIntent
 
 import com.dapsoft.wpmcounter.typing.presentation.TypingViewModel
@@ -49,9 +49,9 @@ internal fun TypingScreen(
 ) {
 
     LaunchedEffect(key1 = viewModel) {
-        viewModel.oneTimeEvent.collect {
+        viewModel.sideEffect.collect {
             when (it) {
-                is TypingOneTimeEvent.LeaveScreen -> {
+                is TypingEffect.LeaveScreen -> {
                     onChangeUser()
                 }
             }
@@ -63,6 +63,10 @@ internal fun TypingScreen(
 
     val annotatedSampleText = remember(uiState.sampleText, uiState.currentWordIndices) {
         viewModel.textMarker.markCurrentWord(uiState.sampleText, uiState.currentWordIndices)
+    }
+
+    val annotatedMistakes = remember(uiState.typedText, uiState.mistakeIndices) {
+        viewModel.textMarker.markMistakes(uiState.typedText, uiState.mistakeIndices)
     }
 
     val textFieldValue = TextFieldValue(
@@ -110,7 +114,7 @@ internal fun TypingScreen(
             ),
             visualTransformation = VisualTransformation {
                 TransformedText(
-                    viewModel.textMarker.markMistakes(uiState.typedText, uiState.mistakeIndices),
+                    annotatedMistakes,
                     OffsetMapping.Identity
                 )
             },

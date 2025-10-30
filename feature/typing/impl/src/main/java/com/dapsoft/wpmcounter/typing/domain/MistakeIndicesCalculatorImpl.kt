@@ -8,14 +8,14 @@ internal class MistakeIndicesCalculatorImpl @Inject constructor(
     private val textValidator: TextValidator
 ) : MistakeIndicesCalculator {
 
-    override fun calculate(sampleText: String, typedText: String): List<Pair<Int, Int>> {
-        val typedWordIntervals = mutableListOf<Pair<Int, Int>>()
+    override fun calculate(sampleText: String, typedText: String): List<IntRange> {
+        val typedWordIntervals = mutableListOf<IntRange>()
         var wordStart = -1
 
         for (i in typedText.indices) {
             if (typedText[i].isWhitespace()) {
                 if (wordStart != -1) {
-                    typedWordIntervals.add(wordStart to i)
+                    typedWordIntervals.add(wordStart until i)
                     wordStart = -1
                 }
             } else if (wordStart == -1) {
@@ -24,7 +24,7 @@ internal class MistakeIndicesCalculatorImpl @Inject constructor(
         }
 
         if (wordStart != -1) {
-            typedWordIntervals.add(wordStart to typedText.length)
+            typedWordIntervals.add(wordStart until typedText.length)
         }
 
         val comparisons = textValidator.compareWords(sampleText, typedText)

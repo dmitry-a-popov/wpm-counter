@@ -1,36 +1,42 @@
 package com.dapsoft.wpmcounter.typing.ui
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
 
 import javax.inject.Inject
 
-class TextMarker @Inject constructor() {
+/**
+ * Utility for producing highlighted text for typing feedback.
+ * All indices are assumed 0-based and inclusive ranges.
+ */
+internal class TextMarker @Inject constructor(
+    private val config: TextMarkerConfig
+) {
 
-    fun markMistakes(text: String, mistakeIndices: List<Pair<Int, Int>>) = buildAnnotatedString {
+    fun markMistakes(text: String, mistakeRanges: List<IntRange>) = buildAnnotatedString {
         append(text)
 
-        for (startEnd in mistakeIndices) {
+        for (range in mistakeRanges) {
                 addStyle(
                     style = SpanStyle(
-                        color = Color.Red,
-                        background = Color.LightGray.copy(alpha = 0.3f)
+                        color = config.mistakeForeground,
+                        background = config.mistakeBackground
                     ),
-                    start = startEnd.first,
-                    end = startEnd.second
+                    start = range.first,
+                    end = range.last + 1
                 )
         }
     }
 
-    fun markCurrentWord(text: String, wordIndices: Pair<Int, Int>) = buildAnnotatedString {
+    fun markCurrentWord(text: String, wordIndices: IntRange?) = buildAnnotatedString {
         append(text)
 
-        addStyle(
-            style = SpanStyle(textDecoration = TextDecoration.Underline),
-            start = wordIndices.first,
-            end = wordIndices.second
-        )
+        wordIndices?.let {
+            addStyle(
+                style = SpanStyle(textDecoration = config.currentWordDecoration),
+                start = it.first,
+                end = it.last + 1
+            )
+        }
     }
 }

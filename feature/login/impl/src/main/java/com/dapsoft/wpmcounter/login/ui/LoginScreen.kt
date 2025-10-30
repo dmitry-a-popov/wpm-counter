@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
-import com.dapsoft.wpmcounter.login.presentation.LoginOneTimeEvent
+import com.dapsoft.wpmcounter.login.presentation.LoginEffect
 import com.dapsoft.wpmcounter.login.presentation.LoginUiIntent
 import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
 
@@ -28,10 +28,10 @@ import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
  * Login screen (Jetpack Compose) implementing a small MVI loop:
  *  - Subscribes to [LoginViewModel.uiState] to render the current user name.
  *  - Dispatches intents to the ViewModel via [LoginViewModel.dispatch] on text change and confirm.
- *  - Collects single-shot effects from [LoginViewModel.oneTimeEvent] for navigation and transient errors.
+ *  - Collects single-shot effects from [LoginViewModel.sideEffect] for navigation and transient errors.
  *
- * Navigation: on [LoginOneTimeEvent.LeaveScreen] invokes [onLoginConfirmed] with the latest user name.
- * Errors: on [LoginOneTimeEvent.ShowLoginError] shows a Toast.
+ * Navigation: on [LoginEffect.LeaveScreen] invokes [onLoginConfirmed] with the latest user name.
+ * Errors: on [LoginEffect.ShowLoginError] shows a Toast.
  *
  * @param viewModel Injected presentation layer ViewModel.
  * @param onLoginConfirmed Callback to proceed after successful login.
@@ -45,10 +45,10 @@ internal fun LoginScreen(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = viewModel) {
-        viewModel.oneTimeEvent.collect {
+        viewModel.sideEffect.collect {
             when (it) {
-                is LoginOneTimeEvent.LeaveScreen -> onLoginConfirmed(uiState.userName)
-                is LoginOneTimeEvent.ShowLoginError -> {
+                is LoginEffect.LeaveScreen -> onLoginConfirmed(uiState.userName)
+                is LoginEffect.ShowLoginError -> {
                     Toast.makeText(
                         context,
                         "Error during user name save",

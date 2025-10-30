@@ -6,6 +6,11 @@ import androidx.navigation.compose.composable
 
 import com.dapsoft.wpmcounter.typing.ui.TypingScreen
 
+/**
+ * Registers the Typing destination in the navigation graph.
+ *
+ * @param onLogout callback invoked after user logout.
+ */
 fun NavGraphBuilder.registerTypingDestination(
     onLogout: () -> Unit
 ) {

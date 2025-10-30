@@ -3,9 +3,9 @@ package com.dapsoft.wpmcounter.typing.presentation
 internal data class TypingUiState(
     val userName: String,
     val sampleText: String,
-    val currentWordIndices: Pair<Int, Int>,
+    val currentWordIndices: IntRange?,
     val typedText: String,
-    val mistakeIndices: List<Pair<Int, Int>>,
+    val mistakeIndices: List<IntRange>,
     val wordsPerMinute: Double,
     val inputState: InputState
 )

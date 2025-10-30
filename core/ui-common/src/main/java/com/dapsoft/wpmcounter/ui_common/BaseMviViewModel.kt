@@ -23,14 +23,14 @@ import kotlinx.coroutines.launch
  * Usage:
  * 1. Provide an initial state in the constructor.
  * 2. UI layer calls [dispatch] with domain intents.
- * 3. Subclass implements [reduce] to mutate state via [setState] and send events via [sendEvent].
+ * 3. Subclass implements [reduce] to mutate state via [setState] and send events via [sendSideEffect].
  *
  * Concurrency:
  * - Intents are consumed sequentially in a single coroutine launched in init.
  * - [reduce] is suspend and runs one at a time; no extra synchronization needed for typical mutations.
  *
  * Events:
- * - One-time events use a SharedFlow with extra buffer capacity (64). [sendEvent] suspends if buffer full.
+ * - One-time events use a SharedFlow with extra buffer capacity (64). [sendSideEffect] suspends if buffer full.
  *
  * Lifecycle:
  * - Channel is closed in [onCleared]; queued intents after cancellation are not processed.
@@ -39,9 +39,9 @@ import kotlinx.coroutines.launch
  * Generics:
  * - UiState: immutable state holder type.
  * - UiIntent: user/system intent type.
- * - OneTimeEvent: fire-and-forget UI event (navigation, toast, etc.).
+ * - SideEffect: fire-and-forget UI side effect (navigation, toast, etc.).
  */
-abstract class BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(initialUiState: UiState) : ViewModel() {
+abstract class BaseMviViewModel<UiState, UiIntent, SideEffect>(initialUiState: UiState) : ViewModel() {
 
     private val _uiState = MutableStateFlow(initialUiState)
     /**
@@ -49,11 +49,11 @@ abstract class BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(initialUiState:
      */
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private val _oneTimeEvent = MutableSharedFlow<OneTimeEvent>(replay = 0, extraBufferCapacity = 64)
+    private val _sideEffect = MutableSharedFlow<SideEffect>(replay = 0, extraBufferCapacity = 64)
     /**
-     * Stream of one-time events; collect in a LaunchedEffect.
+     * Stream of one-time side effects; collect in a LaunchedEffect.
      */
-    val oneTimeEvent: SharedFlow<OneTimeEvent> = _oneTimeEvent.asSharedFlow()
+    val sideEffect: SharedFlow<SideEffect> = _sideEffect.asSharedFlow()
 
     private val intents = Channel<UiIntent>(Channel.UNLIMITED)
 
@@ -87,8 +87,8 @@ abstract class BaseMviViewModel<UiState, UiIntent, OneTimeEvent>(initialUiState:
     /**
      * Emit a one-time event; suspends if buffer is full.
      */
-    protected suspend fun sendEvent(event: OneTimeEvent) {
-        _oneTimeEvent.emit(event)
+    protected suspend fun sendSideEffect(effect: SideEffect) {
+        _sideEffect.emit(effect)
     }
 
     override fun onCleared() {
