@@ -28,6 +28,9 @@ internal class LoginViewModel @Inject constructor(
     private val log: Logger
 ) : BaseMviViewModel<LoginUiState, LoginIntent, LoginEffect>(LoginUiState("")) {
 
+    /**
+     * Intent reducer (single-threaded). Delegates to intent-specific handlers.
+     */
     override suspend fun reduce(intent: LoginIntent) {
         log.d(TAG) { "Processing intent: $intent" }
         when (intent) {

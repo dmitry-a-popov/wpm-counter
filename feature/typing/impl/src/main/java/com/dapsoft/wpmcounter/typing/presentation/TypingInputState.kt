@@ -1,5 +1,8 @@
 package com.dapsoft.wpmcounter.typing.presentation
 
+/**
+ * Input lifecycle states.
+ */
 enum class TypingInputState {
     ACTIVE,
     PAUSED,

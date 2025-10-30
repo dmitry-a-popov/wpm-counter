@@ -3,6 +3,10 @@ package com.dapsoft.wpmcounter.typing.presentation
 import androidx.compose.runtime.Immutable
 
 @Immutable
+/**
+ * Complete immutable snapshot of the typing screen UI.
+ * Index ranges are 0-based and inclusive; `currentWordRange == null` means no active word.
+ */
 internal data class TypingUiState(
     val userName: String,
     val sampleText: String,
