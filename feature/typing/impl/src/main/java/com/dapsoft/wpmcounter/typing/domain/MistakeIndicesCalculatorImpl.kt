@@ -2,7 +2,11 @@ package com.dapsoft.wpmcounter.typing.domain
 
 import com.dapsoft.wpmcounter.common.validation.TextValidator
 
-internal class MistakeIndicesCalculatorImpl(private val textValidator: TextValidator) : MistakeIndicesCalculator {
+import javax.inject.Inject
+
+internal class MistakeIndicesCalculatorImpl @Inject constructor(
+    private val textValidator: TextValidator
+) : MistakeIndicesCalculator {
 
     override fun calculate(sampleText: String, typedText: String): List<Pair<Int, Int>> {
         val typedWordIntervals = mutableListOf<Pair<Int, Int>>()

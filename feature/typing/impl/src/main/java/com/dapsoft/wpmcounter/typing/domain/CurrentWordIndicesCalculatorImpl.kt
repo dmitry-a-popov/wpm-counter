@@ -1,6 +1,8 @@
 package com.dapsoft.wpmcounter.typing.domain
 
-class CurrentWordIndicesCalculatorImpl : CurrentWordIndicesCalculator {
+import javax.inject.Inject
+
+internal class CurrentWordIndicesCalculatorImpl @Inject constructor() : CurrentWordIndicesCalculator {
 
     override fun calculate(typedText: String, wordNumber: Int): Pair<Int, Int> {
         var currentWord = 0
