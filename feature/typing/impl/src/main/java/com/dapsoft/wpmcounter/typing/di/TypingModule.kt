@@ -1,12 +1,12 @@
 package com.dapsoft.wpmcounter.typing.di
 
 import com.dapsoft.wpmcounter.common.validation.TextValidator
-import com.dapsoft.wpmcounter.typing.data.SampleTextRepositoryImpl
+import com.dapsoft.wpmcounter.typing.data.StaticSampleTextProvider
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculatorImpl
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculatorImpl
-import com.dapsoft.wpmcounter.typing.domain.SampleTextRepository
+import com.dapsoft.wpmcounter.typing.domain.SampleTextProvider
 
 import dagger.Module
 import dagger.Provides
@@ -18,8 +18,8 @@ import dagger.hilt.components.SingletonComponent
 object TypingModule {
 
     @Provides
-    internal fun provideSampleTextRepository(): SampleTextRepository {
-        return SampleTextRepositoryImpl()
+    internal fun provideSampleTextRepository(): SampleTextProvider {
+        return StaticSampleTextProvider()
     }
 
     @Provides

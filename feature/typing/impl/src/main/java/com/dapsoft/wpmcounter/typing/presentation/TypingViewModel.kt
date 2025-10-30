@@ -12,12 +12,8 @@ import com.dapsoft.wpmcounter.logger.d
 import com.dapsoft.wpmcounter.logger.e
 import com.dapsoft.wpmcounter.typing.domain.CurrentWordIndicesCalculator
 import com.dapsoft.wpmcounter.typing.domain.MistakeIndicesCalculator
-import com.dapsoft.wpmcounter.typing.domain.SampleTextRepository
-import com.dapsoft.wpmcounter.typing.presentation.InputState
+import com.dapsoft.wpmcounter.typing.domain.SampleTextProvider
 import com.dapsoft.wpmcounter.typing.ui.TextMarker
-import com.dapsoft.wpmcounter.typing.presentation.TypingOneTimeEvent
-import com.dapsoft.wpmcounter.typing.presentation.TypingUiIntent
-import com.dapsoft.wpmcounter.typing.presentation.TypingUiState
 import com.dapsoft.wpmcounter.ui_common.BaseMviViewModel
 import com.dapsoft.wpmcounter.user.UserRepository
 
@@ -30,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class TypingViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val sampleTextRepository: SampleTextRepository,
+    private val sampleTextProvider: SampleTextProvider,
     private val clearEventsUseCase: ClearEventsUseCase,
     private val trackKeyPressUseCase: TrackKeyPressUseCase,
     private val observeTypingSpeedUseCase: ObserveTypingSpeedUseCase,
@@ -66,39 +62,38 @@ internal class TypingViewModel @Inject constructor(
             }
 
             launch {
-                sampleTextRepository.observeText().collect { sampleText ->
-                    setState {
-                        it.copy(
-                            sampleText = sampleText,
-                            currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
-                        )
-                    }
-                    observeTypingSpeedUseCase(sampleText).collect { speedState ->
-                        when {
-                            uiState.value.inputState == InputState.COMPLETED -> {
-                                // Do nothing if completed
+                val sampleText: String = sampleTextProvider.sampleText
+                setState {
+                    it.copy(
+                        sampleText = sampleText,
+                        currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
+                    )
+                }
+                observeTypingSpeedUseCase(sampleText).collect { speedState ->
+                    when {
+                        uiState.value.inputState == InputState.COMPLETED -> {
+                            // Do nothing if completed
+                        }
+                        speedState is TypingSpeedState.Error -> {
+                            setState {
+                                it.copy(
+                                    inputState = InputState.ERROR
+                                )
                             }
-                            speedState is TypingSpeedState.Error -> {
-                                setState {
-                                    it.copy(
-                                        inputState = InputState.ERROR
-                                    )
-                                }
+                        }
+                        speedState is TypingSpeedState.Active -> {
+                            setState {
+                                it.copy(
+                                    inputState = InputState.ACTIVE,
+                                    wordsPerMinute = speedState.wordsPerMinute
+                                )
                             }
-                            speedState is TypingSpeedState.Active -> {
-                                setState {
-                                    it.copy(
-                                        inputState = InputState.ACTIVE,
-                                        wordsPerMinute = speedState.wordsPerMinute
-                                    )
-                                }
-                            }
-                            speedState is TypingSpeedState.Paused -> {
-                                setState {
-                                    it.copy(
-                                        inputState = InputState.PAUSED
-                                    )
-                                }
+                        }
+                        speedState is TypingSpeedState.Paused -> {
+                            setState {
+                                it.copy(
+                                    inputState = InputState.PAUSED
+                                )
                             }
                         }
                     }
