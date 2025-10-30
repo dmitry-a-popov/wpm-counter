@@ -35,7 +35,7 @@ internal class TypingViewModel @Inject constructor(
     private val wordCounter: WordCounter,
     val textMarker: TextMarker,
     val log: Logger
-) : BaseMviViewModel<TypingUiState, TypingUiIntent, TypingEffect>(
+) : BaseMviViewModel<TypingUiState, TypingIntent, TypingEffect>(
     TypingUiState(
         userName = "",
         sampleText = "",
@@ -102,11 +102,11 @@ internal class TypingViewModel @Inject constructor(
         }
     }
 
-    override suspend fun reduce(intent: TypingUiIntent) {
+    override suspend fun reduce(intent: TypingIntent) {
         log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
-            TypingUiIntent.ChangeUser -> changeUser()
-            is TypingUiIntent.ChangeTypedText -> if (intent.text.length > uiState.value.typedText.length) {
+            TypingIntent.ChangeUser -> changeUser()
+            is TypingIntent.ChangeTypedText -> if (intent.text.length > uiState.value.typedText.length) {
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
                     userName = uiState.value.userName
@@ -145,7 +145,7 @@ internal class TypingViewModel @Inject constructor(
                     }
                 }
             }
-            TypingUiIntent.Restart -> clearState()
+            TypingIntent.Restart -> clearState()
         }
     }
 

@@ -21,7 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
 import com.dapsoft.wpmcounter.login.presentation.LoginEffect
-import com.dapsoft.wpmcounter.login.presentation.LoginUiIntent
+import com.dapsoft.wpmcounter.login.presentation.LoginIntent
 import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
 
 /**
@@ -66,12 +66,12 @@ internal fun LoginScreen(
     ) {
         OutlinedTextField(
             value = uiState.userName,
-            onValueChange = { newName -> viewModel.dispatch(LoginUiIntent.ChangeUserName(newName)) },
+            onValueChange = { newName -> viewModel.dispatch(LoginIntent.OnUserNameChanged(newName)) },
             label = { Text("Your name") }
         )
         Spacer(Modifier.height(16.dp))
         Button(
-            onClick = { viewModel.dispatch(LoginUiIntent.ConfirmLogin) },
+            onClick = { viewModel.dispatch(LoginIntent.OnLoginConfirmed) },
             enabled = uiState.userName.isNotBlank()
         ) { Text("Confirm") }
     }

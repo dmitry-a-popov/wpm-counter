@@ -9,15 +9,15 @@ package com.dapsoft.wpmcounter.login.presentation
  *  - Intents are processed one at a time -> simpler reasoning about state transitions.
  *  - They never return a value directly; results are reflected via [LoginUiState] updates or [LoginEffect] emissions.
  */
-internal sealed class LoginUiIntent {
+internal sealed interface LoginIntent {
 
     /**
      * User changed the text input for the user name.
      */
-    data class ChangeUserName(val name: String) : LoginUiIntent()
+    data class OnUserNameChanged(val name: String) : LoginIntent
 
     /**
      * User confirmed the form: triggers persistence and on success navigation.
      */
-    object ConfirmLogin : LoginUiIntent()
+    object OnLoginConfirmed : LoginIntent
 }

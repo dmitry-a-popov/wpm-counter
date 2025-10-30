@@ -38,7 +38,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dapsoft.wpmcounter.typing.presentation.TypingEffect
-import com.dapsoft.wpmcounter.typing.presentation.TypingUiIntent
+import com.dapsoft.wpmcounter.typing.presentation.TypingIntent
 
 import com.dapsoft.wpmcounter.typing.presentation.TypingViewModel
 
@@ -105,7 +105,7 @@ internal fun TypingScreen(
                     text = newValue.text,
                     selection = TextRange(newValue.text.length)
                 )
-                viewModel.dispatch(TypingUiIntent.ChangeTypedText(forcedEndCursor.text))
+                viewModel.dispatch(TypingIntent.ChangeTypedText(forcedEndCursor.text))
             },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -148,8 +148,8 @@ internal fun TypingScreen(
             }
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { viewModel.dispatch(TypingUiIntent.ChangeUser) } ) { Text("Change user") }
+        Button(onClick = { viewModel.dispatch(TypingIntent.ChangeUser) } ) { Text("Change user") }
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { viewModel.dispatch(TypingUiIntent.Restart) } ) { Text("Restart") }
+        Button(onClick = { viewModel.dispatch(TypingIntent.Restart) } ) { Text("Restart") }
     }
 }

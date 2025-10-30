@@ -15,8 +15,8 @@ import javax.inject.Inject
  * Responsibilities:
  * - Holds immutable form state via [LoginUiState] (current user name input).
  * - Processes user/system intents serialized by [BaseMviViewModel]:
- *   - [LoginUiIntent.ChangeUserName] – updates state with the new input value.
- *   - [LoginUiIntent.ConfirmLogin] – triggers persistence through [SaveUserNameUseCase].
+ *   - [LoginIntent.OnUserNameChanged] – updates state with the new input value.
+ *   - [LoginIntent.OnLoginConfirmed] – triggers persistence through [SaveUserNameUseCase].
  * - Emits one-time events via [LoginEffect]:
  *   - [LoginEffect.LeaveScreen] on successful save (navigation to next screen).
  *   - [LoginEffect.ShowLoginError] on validation/persistence failure (transient error signal).
@@ -26,13 +26,13 @@ import javax.inject.Inject
 internal class LoginViewModel @Inject constructor(
     private val saveUserNameUseCase: SaveUserNameUseCase,
     private val log: Logger
-) : BaseMviViewModel<LoginUiState, LoginUiIntent, LoginEffect>(LoginUiState("")) {
+) : BaseMviViewModel<LoginUiState, LoginIntent, LoginEffect>(LoginUiState("")) {
 
-    override suspend fun reduce(intent: LoginUiIntent) {
+    override suspend fun reduce(intent: LoginIntent) {
         log.d(TAG) { "Processing intent: $intent" }
         when (intent) {
-            is LoginUiIntent.ChangeUserName -> setState { it.copy(userName = intent.name) }
-            is LoginUiIntent.ConfirmLogin -> {
+            is LoginIntent.OnUserNameChanged -> setState { it.copy(userName = intent.name) }
+            is LoginIntent.OnLoginConfirmed -> {
                 saveUserNameUseCase(uiState.value.userName).onSuccess {
                     sendSideEffect(LoginEffect.LeaveScreen)
                 }.onFailure {

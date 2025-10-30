@@ -86,7 +86,7 @@ Public contracts for the Login feature. Provides navigation entry definition via
 # Module: feature:login:impl
 ## Purpose
 Implements the Login feature UI and presentation layer. Contains:
-- MVI artifacts: `LoginUiIntent`, `LoginUiState`, `LoginEffect`
+- MVI artifacts: `LoginIntent`, `LoginUiState`, `LoginEffect`
 - Compose screen: `LoginScreen`
 - ViewModel: `LoginViewModel`
 - Navigation helpers: `LoginNavigation`
@@ -106,7 +106,7 @@ Public contracts for the Typing feature. Exposes navigation entry via `TypingRou
 # Module: feature:typing:impl
 ## Purpose
 Implements Typing feature domain + UI:
-- MVI/UI artifacts: `TypingUiIntent`, `TypingUiState`, `TypingEffect`, `TypingScreen`, `TextMarker`
+- MVI/UI artifacts: `TypingIntent`, `TypingUiState`, `TypingEffect`, `TypingScreen`, `TextMarker`
 - ViewModel: `TypingViewModel`
 - Domain logic: `CurrentWordIndicesCalculator` (+ `CurrentWordIndicesCalculatorImpl`), `MistakeIndicesCalculator` (+ `MistakeIndicesCalculatorImpl`), sample text retrieval (`SampleTextProvider`)
 - Navigation helpers: `TypingNavigation`
