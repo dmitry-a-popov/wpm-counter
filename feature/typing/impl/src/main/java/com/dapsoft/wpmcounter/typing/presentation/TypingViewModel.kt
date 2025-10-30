@@ -35,17 +35,7 @@ internal class TypingViewModel @Inject constructor(
     private val wordCounter: WordCounter,
     val textMarker: TextMarker,
     val log: Logger
-) : BaseMviViewModel<TypingUiState, TypingIntent, TypingEffect>(
-    TypingUiState(
-        userName = "",
-        sampleText = "",
-        currentWordIndices = null,
-        typedText = "",
-        mistakeIndices = emptyList(),
-        wordsPerMinute = 0.toDouble(),
-        inputState = InputState.PAUSED
-    )
-) {
+) : BaseMviViewModel<TypingUiState, TypingIntent, TypingEffect>(TypingUiState.initial()) {
 
     init {
         viewModelScope.launch {
@@ -66,25 +56,25 @@ internal class TypingViewModel @Inject constructor(
                 setState {
                     it.copy(
                         sampleText = sampleText,
-                        currentWordIndices = currentWordIndicesCalculator.calculate(sampleText, 0)
+                        currentWordRange = currentWordIndicesCalculator.calculate(sampleText, 0)
                     )
                 }
                 observeTypingSpeedUseCase(sampleText).collect { speedState ->
                     when {
-                        uiState.value.inputState == InputState.COMPLETED -> {
+                        uiState.value.inputState == TypingInputState.COMPLETED -> {
                             // Do nothing if completed
                         }
                         speedState is TypingSpeedState.Error -> {
                             setState {
                                 it.copy(
-                                    inputState = InputState.ERROR
+                                    inputState = TypingInputState.ERROR
                                 )
                             }
                         }
                         speedState is TypingSpeedState.Active -> {
                             setState {
                                 it.copy(
-                                    inputState = InputState.ACTIVE,
+                                    inputState = TypingInputState.ACTIVE,
                                     wordsPerMinute = speedState.wordsPerMinute
                                 )
                             }
@@ -92,7 +82,7 @@ internal class TypingViewModel @Inject constructor(
                         speedState is TypingSpeedState.Paused -> {
                             setState {
                                 it.copy(
-                                    inputState = InputState.PAUSED
+                                    inputState = TypingInputState.PAUSED
                                 )
                             }
                         }
@@ -110,11 +100,11 @@ internal class TypingViewModel @Inject constructor(
                 trackKeyPressUseCase(
                     symbol = intent.text.last(),
                     userName = uiState.value.userName
-                ).onFailure {
-                    log.e(TAG, it) { "Error tracking key press for symbol='${intent.text.last()}'" }
+                ).onFailure { exception ->
+                    log.e(TAG, exception) { "Error tracking key press for symbol='${intent.text.last()}'" }
                     setState {
                         it.copy(
-                            inputState = InputState.ERROR
+                            inputState = TypingInputState.ERROR
                         )
                     }
                 }
@@ -124,11 +114,11 @@ internal class TypingViewModel @Inject constructor(
                 setState {
                     it.copy(
                         typedText = intent.text,
-                        mistakeIndices = mistakeIndicesCalculator.calculate(
+                        mistakeRanges = mistakeIndicesCalculator.calculate(
                             uiState.value.sampleText,
                             intent.text
                         ),
-                        currentWordIndices = currentWordIndicesCalculator.calculate(
+                        currentWordRange = currentWordIndicesCalculator.calculate(
                             uiState.value.sampleText,
                             currentWordNumber
                         )
@@ -140,7 +130,7 @@ internal class TypingViewModel @Inject constructor(
                 if (currentWordNumber + 1 > sampleTextWordNumber) {
                     setState {
                         it.copy(
-                            inputState = InputState.COMPLETED
+                            inputState = TypingInputState.COMPLETED
                         )
                     }
                 }
@@ -150,13 +140,13 @@ internal class TypingViewModel @Inject constructor(
     }
 
     private suspend fun clearState() {
-        val newInputState = if (clearEventsUseCase().isSuccess) InputState.PAUSED else InputState.ERROR
+        val newInputState = if (clearEventsUseCase().isSuccess) TypingInputState.PAUSED else TypingInputState.ERROR
         setState {
             it.copy(
                 typedText = "",
-                currentWordIndices = null,
-                mistakeIndices = emptyList(),
-                wordsPerMinute = 0.toDouble(),
+                currentWordRange = null,
+                mistakeRanges = emptyList(),
+                wordsPerMinute = 0.toFloat(),
                 inputState = newInputState
             )
         }

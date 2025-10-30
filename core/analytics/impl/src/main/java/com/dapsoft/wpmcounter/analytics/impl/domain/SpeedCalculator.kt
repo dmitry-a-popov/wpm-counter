@@ -11,5 +11,5 @@ import kotlin.time.Duration
  * - Active time is the cumulative time during which typing was detected.
  */
 internal interface SpeedCalculator {
-    fun calculateWordsPerMinute(validWordsCount: Int, activeTime: Duration): Double
+    fun calculateWordsPerMinute(validWordsCount: Int, activeTime: Duration): Float
 }

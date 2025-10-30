@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dapsoft.wpmcounter.typing.presentation.TypingEffect
+import com.dapsoft.wpmcounter.typing.presentation.TypingInputState
 import com.dapsoft.wpmcounter.typing.presentation.TypingIntent
 
 import com.dapsoft.wpmcounter.typing.presentation.TypingViewModel
@@ -61,12 +62,12 @@ internal fun TypingScreen(
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
-    val annotatedSampleText = remember(uiState.sampleText, uiState.currentWordIndices) {
-        viewModel.textMarker.markCurrentWord(uiState.sampleText, uiState.currentWordIndices)
+    val annotatedSampleText = remember(uiState.sampleText, uiState.currentWordRange) {
+        viewModel.textMarker.markCurrentWord(uiState.sampleText, uiState.currentWordRange)
     }
 
-    val annotatedMistakes = remember(uiState.typedText, uiState.mistakeIndices) {
-        viewModel.textMarker.markMistakes(uiState.typedText, uiState.mistakeIndices)
+    val annotatedMistakes = remember(uiState.typedText, uiState.mistakeRanges) {
+        viewModel.textMarker.markMistakes(uiState.typedText, uiState.mistakeRanges)
     }
 
     val textFieldValue = TextFieldValue(
@@ -87,7 +88,7 @@ internal fun TypingScreen(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = uiState.inputState.displayText,
+            text = uiState.inputState.toDisplayText(),
             modifier = Modifier.fillMaxWidth(),
             fontSize = 24.sp
         )
@@ -152,4 +153,11 @@ internal fun TypingScreen(
         Spacer(Modifier.height(16.dp))
         Button(onClick = { viewModel.dispatch(TypingIntent.Restart) } ) { Text("Restart") }
     }
+}
+
+internal fun TypingInputState.toDisplayText(): String = when (this) {
+    TypingInputState.ACTIVE -> "Active"
+    TypingInputState.PAUSED -> "Paused"
+    TypingInputState.ERROR -> "Internal Error, Please restart"
+    TypingInputState.COMPLETED -> "Completed"
 }

@@ -1,29 +1,26 @@
 package com.dapsoft.wpmcounter.typing.presentation
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 internal data class TypingUiState(
     val userName: String,
     val sampleText: String,
-    val currentWordIndices: IntRange?,
+    val currentWordRange: IntRange?,
     val typedText: String,
-    val mistakeIndices: List<IntRange>,
-    val wordsPerMinute: Double,
-    val inputState: InputState
-)
-
-internal enum class InputState {
-    ACTIVE,
-    PAUSED,
-    ERROR,
-    COMPLETED;
-
-    val isInputEnabled: Boolean
-        get() = this == ACTIVE || this == PAUSED
-
-    val displayText: String
-        get() = when (this) {
-            ACTIVE -> "Active"
-            PAUSED -> "Paused"
-            ERROR -> "Internal Error, Please restart"
-            COMPLETED -> "Completed"
-        }
+    val mistakeRanges: List<IntRange>,
+    val wordsPerMinute: Float,
+    val inputState: TypingInputState
+) {
+    companion object {
+        fun initial() = TypingUiState(
+            userName = "",
+            sampleText = "",
+            currentWordRange = null,
+            typedText = "",
+            mistakeRanges = emptyList(),
+            wordsPerMinute = 0f,
+            inputState = TypingInputState.PAUSED
+        )
+    }
 }
