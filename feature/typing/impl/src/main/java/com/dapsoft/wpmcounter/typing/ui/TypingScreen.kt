@@ -1,23 +1,19 @@
 package com.dapsoft.wpmcounter.typing.ui
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,6 +52,32 @@ private const val HEADER_FONT_SIZE_SP = 24
 private const val SECTION_SPACER_DP = 16
 private const val SMALL_SPACER_DP = 8
 
+/**
+ * High-level typing practice screen.
+ *
+ * Responsibilities:
+ * 1. Collects side effects from [TypingViewModel] (e.g. navigation via `TypingEffect.LeaveScreen`).
+ * 2. Observes UI state: WPM, input state, user name, sample text, typed text, mistakes, current word range.
+ * 3. Builds annotated sample text and mistake highlighting via [TextMarker].
+ * 4. Shows:
+ *    - Live WPM (polite accessibility live region).
+ *    - Current input state (ACTIVE / PAUSED / ERROR / COMPLETED).
+ *    - Greeting with user name.
+ *    - Sample text with current word highlighting.
+ *    - Multiline input field with:
+ *        * Forced cursor at end (cannot move back manually).
+ *        * Disabled IME suggestions (Password keyboard type).
+ *        * Mistake highlighting through a custom [VisualTransformation].
+ *        * `isError` flag when mistakes exist (Material error styling).
+ *        * Alpha reduction when input is disabled.
+ *    - Buttons to change user and restart session.
+ *
+ * The column is scrollable to accommodate long sample text. Insets are handled by outer Scaffold.
+ *
+ * @param viewModel Source of state and side effects.
+ * @param onChangeUser Callback triggered when user switching is requested.
+ * @param textMarker Provides span annotation for current word and mistakes.
+ */
 @Composable
 internal fun TypingScreen(
     viewModel: TypingViewModel,
@@ -91,81 +113,75 @@ internal fun TypingScreen(
     )
 
     val columnScroll = rememberScrollState()
-    val inputScroll = rememberScrollState()
 
-    Column(
-        Modifier
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .padding(OUTER_PADDING_DP.dp)
-            .verticalScroll(columnScroll)
-    ) {
-        Text(
-            text = stringResource(id = R.string.typing_speed_wpm, formattedWordsPerMinute),
+    Scaffold { innerPadding ->
+        Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .semantics { liveRegion = LiveRegionMode.Polite },
-            fontSize = HEADER_FONT_SIZE_SP.sp
-        )
-        Spacer(Modifier.height(SMALL_SPACER_DP.dp))
-        Text(
-            text = stringResource(uiState.inputState.toDisplayTextRes()),
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = HEADER_FONT_SIZE_SP.sp
-        )
-        Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-        Text(stringResource(id = R.string.typing_greeting_template, uiState.userName))
-        Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-        Text(
-            text = annotatedSampleText
-        )
-        Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-        BasicTextField(
-            value = textFieldValue,
-            onValueChange = { newValue ->
-                val forcedEndCursor = TextFieldValue(
-                    text = newValue.text,
-                    selection = TextRange(newValue.text.length)
-                )
-                viewModel.dispatch(TypingIntent.ChangeTypedText(forcedEndCursor.text))
-            },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Password //To avoid suggestions
-            ),
-            visualTransformation = VisualTransformation {
-                TransformedText(annotatedMistakes, OffsetMapping.Identity)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(TEXT_FIELD_HEIGHT_DP.dp)
-                .onPreviewKeyEvent {
-                    it.key == Key.Backspace
-                }
-                .alpha(if (!uiState.inputState.isInputEnabled) 0.6f else 1f),
-            enabled = uiState.inputState.isInputEnabled,
-            decorationBox = { inner ->
-                Box(
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            Column(
+                Modifier
+                    .padding(OUTER_PADDING_DP.dp)
+                    .verticalScroll(columnScroll)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.typing_speed_wpm, formattedWordsPerMinute),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(4.dp)
+                        .semantics { liveRegion = LiveRegionMode.Polite },
+                    fontSize = HEADER_FONT_SIZE_SP.sp
+                )
+                Spacer(Modifier.height(SMALL_SPACER_DP.dp))
+                Text(
+                    text = stringResource(uiState.inputState.toDisplayTextRes()),
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = HEADER_FONT_SIZE_SP.sp
+                )
+                Spacer(Modifier.height(SECTION_SPACER_DP.dp))
+                Text(stringResource(id = R.string.typing_greeting_template, uiState.userName))
+                Spacer(Modifier.height(SECTION_SPACER_DP.dp))
+                Text(
+                    text = annotatedSampleText
+                )
+                Spacer(Modifier.height(SECTION_SPACER_DP.dp))
+                OutlinedTextField(
+                    value = textFieldValue,
+                    onValueChange = { newValue ->
+                        val forcedEndCursor = TextFieldValue(
+                            text = newValue.text,
+                            selection = TextRange(newValue.text.length)
                         )
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                ) {
-                    Box(Modifier.verticalScroll(inputScroll)) { inner() }
+                        viewModel.dispatch(TypingIntent.ChangeTypedText(forcedEndCursor.text))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(TEXT_FIELD_HEIGHT_DP.dp)
+                        .onPreviewKeyEvent { it.key == Key.Backspace }
+                        .alpha(if (!uiState.inputState.isInputEnabled) 0.6f else 1f),
+                    enabled = uiState.inputState.isInputEnabled,
+                    singleLine = false,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Password //To avoid IME suggestions
+                    ),
+                    visualTransformation = VisualTransformation {
+                        TransformedText(annotatedMistakes, OffsetMapping.Identity)
+                    },
+                    isError = uiState.mistakeRanges.isNotEmpty(),
+                    label = null,
+                    placeholder = null
+                )
+                Spacer(Modifier.height(SECTION_SPACER_DP.dp))
+                Button(onClick = { viewModel.dispatch(TypingIntent.ChangeUser) } ) {
+                    Text(stringResource(id = R.string.typing_change_user))
+                }
+                Spacer(Modifier.height(16.dp))
+                Button(onClick = { viewModel.dispatch(TypingIntent.Restart) } ) {
+                    Text(stringResource(id = R.string.typing_restart))
                 }
             }
-        )
-        Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-        Button(onClick = { viewModel.dispatch(TypingIntent.ChangeUser) } ) {
-            Text(stringResource(id = R.string.typing_change_user))
-        }
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = { viewModel.dispatch(TypingIntent.Restart) } ) {
-            Text(stringResource(id = R.string.typing_restart))
         }
     }
 }

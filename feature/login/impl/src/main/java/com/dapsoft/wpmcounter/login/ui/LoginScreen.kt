@@ -2,11 +2,8 @@ package com.dapsoft.wpmcounter.login.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -65,7 +62,6 @@ internal fun LoginScreen(
     ) { paddingValues ->
         Column(
             Modifier
-                .windowInsetsPadding(WindowInsets.safeDrawing)
                 .padding(paddingValues)
                 .padding(24.dp)
         ) {
