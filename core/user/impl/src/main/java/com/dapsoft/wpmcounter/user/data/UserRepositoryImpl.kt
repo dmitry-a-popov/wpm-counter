@@ -3,8 +3,8 @@ package com.dapsoft.wpmcounter.user.data
 import com.dapsoft.wpmcounter.user.UserRepository
 
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
+import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
