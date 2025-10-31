@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="typing_speed_wpm">Скорость (слов/мин): %1$s</string>
+    <string name="typing_greeting_template">Здравствуйте, %1$s, пожалуйста, введите следующий текст:</string>
+    <string name="typing_change_user">Сменить пользователя</string>
+    <string name="typing_restart">Перезапустить</string>
+    <string name="typing_state_active">Активно</string>
+    <string name="typing_state_paused">Пауза</string>
+    <string name="typing_state_error">Внутренняя ошибка. Пожалуйста, перезапустите</string>
+    <string name="typing_state_completed">Завершено</string>
+</resources>
+

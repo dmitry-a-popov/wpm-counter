@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="typing_speed_wpm">Speed (WPM): %1$s</string>
+    <string name="typing_greeting_template">Hello, %1$s, please type the following text:</string>
+    <string name="typing_change_user">Change user</string>
+    <string name="typing_restart">Restart</string>
+    <string name="typing_state_active">Active</string>
+    <string name="typing_state_paused">Paused</string>
+    <string name="typing_state_error">Internal Error, Please restart</string>
+    <string name="typing_state_completed">Completed</string>
+</resources>
+

@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import com.dapsoft.wpmcounter.typing.impl.R
 import com.dapsoft.wpmcounter.typing.presentation.TypingEffect
 import com.dapsoft.wpmcounter.typing.presentation.TypingInputState
 import com.dapsoft.wpmcounter.typing.presentation.TypingIntent
@@ -98,7 +100,7 @@ internal fun TypingScreen(
             .verticalScroll(columnScroll)
     ) {
         Text(
-            text = "Speed (WPM): $formattedWordsPerMinute",
+            text = stringResource(id = R.string.typing_speed_wpm, formattedWordsPerMinute),
             modifier = Modifier
                 .fillMaxWidth()
                 .semantics { liveRegion = LiveRegionMode.Polite },
@@ -106,12 +108,12 @@ internal fun TypingScreen(
         )
         Spacer(Modifier.height(SMALL_SPACER_DP.dp))
         Text(
-            text = uiState.inputState.toDisplayText(),
+            text = stringResource(uiState.inputState.toDisplayTextRes()),
             modifier = Modifier.fillMaxWidth(),
             fontSize = HEADER_FONT_SIZE_SP.sp
         )
         Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-        Text("Hello, ${uiState.userName}, please type the following text:")
+        Text(stringResource(id = R.string.typing_greeting_template, uiState.userName))
         Spacer(Modifier.height(SECTION_SPACER_DP.dp))
         Text(
             text = annotatedSampleText
@@ -159,18 +161,18 @@ internal fun TypingScreen(
         )
         Spacer(Modifier.height(SECTION_SPACER_DP.dp))
         Button(onClick = { viewModel.dispatch(TypingIntent.ChangeUser) } ) {
-            Text("Change user")
+            Text(stringResource(id = R.string.typing_change_user))
         }
         Spacer(Modifier.height(16.dp))
         Button(onClick = { viewModel.dispatch(TypingIntent.Restart) } ) {
-            Text("Restart")
+            Text(stringResource(id = R.string.typing_restart))
         }
     }
 }
 
-internal fun TypingInputState.toDisplayText(): String = when (this) {
-    TypingInputState.ACTIVE -> "Active"
-    TypingInputState.PAUSED -> "Paused"
-    TypingInputState.ERROR -> "Internal Error, Please restart"
-    TypingInputState.COMPLETED -> "Completed"
+internal fun TypingInputState.toDisplayTextRes(): Int = when (this) {
+    TypingInputState.ACTIVE -> R.string.typing_state_active
+    TypingInputState.PAUSED -> R.string.typing_state_paused
+    TypingInputState.ERROR -> R.string.typing_state_error
+    TypingInputState.COMPLETED -> R.string.typing_state_completed
 }
