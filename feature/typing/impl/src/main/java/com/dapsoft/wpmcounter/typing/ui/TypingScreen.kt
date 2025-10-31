@@ -17,12 +17,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -86,8 +84,8 @@ internal fun TypingScreen(
 ) {
 
     LaunchedEffect(key1 = viewModel) {
-        viewModel.sideEffect.collect {
-            when (it) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
                 is TypingEffect.LeaveScreen -> onChangeUser()
             }
         }
@@ -107,12 +105,18 @@ internal fun TypingScreen(
         String.format(Locale.US, "%.2f", uiState.wordsPerMinute)
     }
 
-    val textFieldValue = TextFieldValue(
-        text = uiState.typedText,
-        selection = TextRange(uiState.typedText.length)
-    )
+    val textFieldValue by remember(uiState.typedText) {
+        mutableStateOf(
+            TextFieldValue(
+                text = uiState.typedText,
+                selection = TextRange(uiState.typedText.length)
+            )
+        )
+    }
 
-    val columnScroll = rememberScrollState()
+    val mistakeTransformation = remember(annotatedMistakes) {
+        VisualTransformation { TransformedText(annotatedMistakes, OffsetMapping.Identity) }
+    }
 
     Scaffold { innerPadding ->
         Surface(
@@ -123,66 +127,99 @@ internal fun TypingScreen(
             Column(
                 Modifier
                     .padding(OUTER_PADDING_DP.dp)
-                    .verticalScroll(columnScroll)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = stringResource(id = R.string.typing_speed_wpm, formattedWordsPerMinute),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics { liveRegion = LiveRegionMode.Polite },
-                    fontSize = HEADER_FONT_SIZE_SP.sp
-                )
-                Spacer(Modifier.height(SMALL_SPACER_DP.dp))
-                Text(
-                    text = stringResource(uiState.inputState.toDisplayTextRes()),
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = HEADER_FONT_SIZE_SP.sp
-                )
+                HeaderSection(formattedWordsPerMinute, uiState.inputState, uiState.userName)
                 Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-                Text(stringResource(id = R.string.typing_greeting_template, uiState.userName))
+                SampleTextSection(annotatedSampleText)
                 Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-                Text(
-                    text = annotatedSampleText
-                )
-                Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-                OutlinedTextField(
+                TypingInputField(
                     value = textFieldValue,
-                    onValueChange = { newValue ->
-                        val forcedEndCursor = TextFieldValue(
-                            text = newValue.text,
-                            selection = TextRange(newValue.text.length)
-                        )
-                        viewModel.dispatch(TypingIntent.ChangeTypedText(forcedEndCursor.text))
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(TEXT_FIELD_HEIGHT_DP.dp)
-                        .onPreviewKeyEvent { it.key == Key.Backspace }
-                        .alpha(if (!uiState.inputState.isInputEnabled) 0.6f else 1f),
+                    hasMistakes = uiState.mistakeRanges.isNotEmpty(),
+                    mistakeTransformation = mistakeTransformation,
                     enabled = uiState.inputState.isInputEnabled,
-                    singleLine = false,
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrectEnabled = false,
-                        keyboardType = KeyboardType.Password //To avoid IME suggestions
-                    ),
-                    visualTransformation = VisualTransformation {
-                        TransformedText(annotatedMistakes, OffsetMapping.Identity)
-                    },
-                    isError = uiState.mistakeRanges.isNotEmpty(),
-                    label = null,
-                    placeholder = null
+                    onChange = { newValue ->
+                        viewModel.dispatch(TypingIntent.ChangeTypedText(newValue.text))
+                    }
                 )
                 Spacer(Modifier.height(SECTION_SPACER_DP.dp))
-                Button(onClick = { viewModel.dispatch(TypingIntent.ChangeUser) } ) {
-                    Text(stringResource(id = R.string.typing_change_user))
-                }
-                Spacer(Modifier.height(16.dp))
-                Button(onClick = { viewModel.dispatch(TypingIntent.Restart) } ) {
-                    Text(stringResource(id = R.string.typing_restart))
-                }
+                ActionsSection(
+                    onChangeUser = { viewModel.dispatch(TypingIntent.ChangeUser) },
+                    onRestart = { viewModel.dispatch(TypingIntent.Restart) }
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun HeaderSection(
+    wordPerMinute: String,
+    inputState: TypingInputState,
+    userName: String
+) {
+    Column {
+        Text(
+            text = stringResource(id = R.string.typing_speed_wpm, wordPerMinute),
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { liveRegion = LiveRegionMode.Polite },
+            fontSize = HEADER_FONT_SIZE_SP.sp
+        )
+        Spacer(Modifier.height(SMALL_SPACER_DP.dp))
+        Text(
+            text = stringResource(inputState.toDisplayTextRes()),
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = HEADER_FONT_SIZE_SP.sp
+        )
+        Spacer(Modifier.height(SECTION_SPACER_DP.dp))
+        Text(stringResource(id = R.string.typing_greeting_template, userName))
+    }
+}
+
+@Composable
+private fun SampleTextSection(annotatedSampleText: androidx.compose.ui.text.AnnotatedString) {
+    Text(text = annotatedSampleText)
+}
+
+@Composable
+private fun TypingInputField(
+    value: TextFieldValue,
+    hasMistakes: Boolean,
+    mistakeTransformation: VisualTransformation,
+    enabled: Boolean,
+    onChange: (TextFieldValue) -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(TEXT_FIELD_HEIGHT_DP.dp)
+            .alpha(if (enabled) 1f else 0.6f),
+        enabled = enabled,
+        singleLine = false,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Password // Disable IME suggestions
+        ),
+        visualTransformation = mistakeTransformation,
+        isError = hasMistakes
+    )
+}
+
+@Composable
+private fun ActionsSection(
+    onChangeUser: () -> Unit,
+    onRestart: () -> Unit
+) {
+    Button(onClick = onChangeUser) {
+        Text(stringResource(id = R.string.typing_change_user))
+    }
+    Spacer(Modifier.height(16.dp))
+    Button(onClick = onRestart) {
+        Text(stringResource(id = R.string.typing_restart))
     }
 }
 
