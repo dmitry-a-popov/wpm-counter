@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_error_user_save">Помилка під час збереження імені користувача</string>
+    <string name="login_label_user_name">Ваше ім\'я</string>
+    <string name="login_confirm">Підтвердити</string>
+</resources>
+

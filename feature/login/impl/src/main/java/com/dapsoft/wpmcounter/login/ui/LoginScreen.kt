@@ -1,7 +1,5 @@
 package com.dapsoft.wpmcounter.login.ui
 
-import android.widget.Toast
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -11,18 +9,23 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.dapsoft.wpmcounter.login.presentation.LoginEffect
 import com.dapsoft.wpmcounter.login.presentation.LoginIntent
 import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
+import com.dapsoft.wpmcounter.login.impl.R
 
 /**
  * Login screen (Jetpack Compose) implementing a small MVI loop:
@@ -31,7 +34,7 @@ import com.dapsoft.wpmcounter.login.presentation.LoginViewModel
  *  - Collects single-shot effects from [LoginViewModel.sideEffect] for navigation and transient errors.
  *
  * Navigation: on [LoginEffect.LeaveScreen] invokes [onLoginConfirmed] with the latest user name.
- * Errors: on [LoginEffect.ShowLoginError] shows a Toast.
+ * Errors: on [LoginEffect.ShowLoginError] shows a Material3 Snackbar.
  *
  * @param viewModel Injected presentation layer ViewModel.
  * @param onLoginConfirmed Callback to proceed after successful login.
@@ -42,37 +45,40 @@ internal fun LoginScreen(
     onLoginConfirmed: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val errorMessage = stringResource(id = R.string.login_error_user_save)
 
     LaunchedEffect(key1 = viewModel) {
-        viewModel.sideEffect.collect {
-            when (it) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
                 is LoginEffect.LeaveScreen -> onLoginConfirmed(uiState.userName)
                 is LoginEffect.ShowLoginError -> {
-                    Toast.makeText(
-                        context,
-                        "Error during user name save",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    snackbarHostState.showSnackbar(message = errorMessage)
                 }
             }
         }
     }
 
-    Column(
-        Modifier
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .padding(24.dp)
-    ) {
-        OutlinedTextField(
-            value = uiState.userName,
-            onValueChange = { newName -> viewModel.dispatch(LoginIntent.OnUserNameChanged(newName)) },
-            label = { Text("Your name") }
-        )
-        Spacer(Modifier.height(16.dp))
-        Button(
-            onClick = { viewModel.dispatch(LoginIntent.OnLoginConfirmed) },
-            enabled = uiState.userName.isNotBlank()
-        ) { Text("Confirm") }
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { paddingValues ->
+        Column(
+            Modifier
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(paddingValues)
+                .padding(24.dp)
+        ) {
+            OutlinedTextField(
+                value = uiState.userName,
+                onValueChange = { newName -> viewModel.dispatch(LoginIntent.OnUserNameChanged(newName)) },
+                label = { Text(stringResource(id = R.string.login_label_user_name)) }
+            )
+            Spacer(Modifier.height(16.dp))
+            Button(
+                onClick = { viewModel.dispatch(LoginIntent.OnLoginConfirmed) },
+                enabled = uiState.userName.isNotBlank()
+            ) { Text(stringResource(id = R.string.login_confirm)) }
+        }
     }
 }

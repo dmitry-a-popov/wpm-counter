@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_error_user_save">Error during user name save</string>
+    <string name="login_label_user_name">Your name</string>
+    <string name="login_confirm">Confirm</string>
+</resources>
+
