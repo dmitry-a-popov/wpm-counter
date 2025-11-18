@@ -1,5 +1,8 @@
 package com.dapsoft.wpmcounter.login.presentation
 
+import app.cash.turbine.test
+
+import com.dapsoft.wpmcounter.logger.LogLevel
 import com.dapsoft.wpmcounter.logger.Logger
 import com.dapsoft.wpmcounter.test_utils.MainDispatcherRule
 import com.dapsoft.wpmcounter.user.SaveUserNameUseCase
@@ -8,12 +11,8 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineStart
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -62,56 +61,47 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `onLoginConfirmed with success emits LeaveScreen effect`() = runBlocking {
+    fun `onLoginConfirmed with success emits LeaveScreen effect`() = runTest {
         val userName = "testUser"
         coEvery { saveUserNameUseCase(userName) } returns Result.success(Unit)
 
-        val effectDeferred = async(start = CoroutineStart.UNDISPATCHED) {
-            withTimeout(1_000) { viewModel.sideEffect.first() }
+        viewModel.sideEffect.test {
+            viewModel.dispatch(LoginIntent.OnUserNameChanged(userName))
+            viewModel.dispatch(LoginIntent.OnLoginConfirmed)
+
+            assertTrue(awaitItem() is LoginEffect.LeaveScreen)
         }
-
-        viewModel.dispatch(LoginIntent.OnUserNameChanged(userName))
-        viewModel.dispatch(LoginIntent.OnLoginConfirmed)
-
-        val effect = effectDeferred.await()
-        assertTrue(effect is LoginEffect.LeaveScreen)
 
         coVerify(exactly = 1) { saveUserNameUseCase(userName) }
     }
 
     @Test
-    fun `onLoginConfirmed with failure emits ShowLoginError effect`() = runBlocking {
+    fun `onLoginConfirmed with failure emits ShowLoginError effect`() = runTest {
         val userName = "testUser"
         val exception = IllegalStateException("save failed")
         coEvery { saveUserNameUseCase(userName) } returns Result.failure(exception)
 
-        val effectDeferred = async(start = CoroutineStart.UNDISPATCHED) {
-            withTimeout(1_000) { viewModel.sideEffect.first() }
+        viewModel.sideEffect.test {
+            viewModel.dispatch(LoginIntent.OnUserNameChanged(userName))
+            viewModel.dispatch(LoginIntent.OnLoginConfirmed)
+
+            assertTrue(awaitItem() is LoginEffect.ShowLoginError)
         }
-
-        viewModel.dispatch(LoginIntent.OnUserNameChanged(userName))
-        viewModel.dispatch(LoginIntent.OnLoginConfirmed)
-
-        val effect = effectDeferred.await()
-        assertTrue(effect is LoginEffect.ShowLoginError)
 
         coVerify(exactly = 1) { saveUserNameUseCase(userName) }
     }
 
     @Test
-    fun `onLoginConfirmed uses current state userName`() = runBlocking {
+    fun `onLoginConfirmed uses current state userName`() = runTest {
         coEvery { saveUserNameUseCase("updated") } returns Result.success(Unit)
 
-        val effectDeferred = async(start = CoroutineStart.UNDISPATCHED) {
-            withTimeout(1_000) { viewModel.sideEffect.first() }
+        viewModel.sideEffect.test {
+            viewModel.dispatch(LoginIntent.OnUserNameChanged("initial"))
+            viewModel.dispatch(LoginIntent.OnUserNameChanged("updated"))
+            viewModel.dispatch(LoginIntent.OnLoginConfirmed)
+
+            assertTrue(awaitItem() is LoginEffect.LeaveScreen)
         }
-
-        viewModel.dispatch(LoginIntent.OnUserNameChanged("initial"))
-        viewModel.dispatch(LoginIntent.OnUserNameChanged("updated"))
-        viewModel.dispatch(LoginIntent.OnLoginConfirmed)
-
-        val effect = effectDeferred.await()
-        assertTrue(effect is LoginEffect.LeaveScreen)
 
         coVerify(exactly = 1) { saveUserNameUseCase("updated") }
     }
@@ -121,17 +111,38 @@ class LoginViewModelTest {
         val userName = "testUser"
         coEvery { saveUserNameUseCase(userName) } returns Result.success(Unit)
 
-        viewModel.dispatch(LoginIntent.OnUserNameChanged(userName))
-        viewModel.dispatch(LoginIntent.OnLoginConfirmed)
+        val loginConfirmedIntent = LoginIntent.OnLoginConfirmed
 
-        verify(exactly = 2) { logger.log(any(), any(), null, any()) }
+        viewModel.dispatch(LoginIntent.OnUserNameChanged(userName))
+        viewModel.dispatch(loginConfirmedIntent)
+
+        verify(exactly = 1) {
+            logger.log(
+                eq(LogLevel.DEBUG),
+                eq(LoginViewModel.TAG),
+                isNull(),
+                match<() -> String> { lambda ->
+                    lambda().contains("$loginConfirmedIntent")
+                }
+            )
+        }
     }
 
     @Test
     fun `onUserNameChanged logs intent processing`() {
-        viewModel.dispatch(LoginIntent.OnUserNameChanged("test"))
+        val intent = LoginIntent.OnUserNameChanged("test")
+        viewModel.dispatch(intent)
 
-        verify(exactly = 1) { logger.log(any(), any(), null, any()) }
+        verify(exactly = 1) {
+            logger.log(
+                eq(LogLevel.DEBUG),
+                eq(LoginViewModel.TAG),
+                isNull(),
+                match<() -> String> { lambda ->
+                    lambda().contains("$intent")
+                }
+            )
+        }
     }
 }
 

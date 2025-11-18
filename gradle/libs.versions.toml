@@ -10,16 +10,17 @@ espressoCore = "3.7.0"
 kotlinxCoroutinesTest = "1.10.2"
 lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.11.0"
-composeBom = "2025.10.01"
+composeBom = "2025.11.00"
 appcompat = "1.7.1"
 material = "1.13.0"
 hilt = "2.57.2"
-navCompose = "2.9.5"
+navCompose = "2.9.6"
 material3Android = "1.4.0"
 ksp = "2.3.0"
 room = "2.8.3"
 mockk = "1.14.6"
 jetbrainsKotlinJvm = "2.2.21"
+turbine = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ androidx-material3-android = { group = "androidx.compose.material3", name = "mat
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
