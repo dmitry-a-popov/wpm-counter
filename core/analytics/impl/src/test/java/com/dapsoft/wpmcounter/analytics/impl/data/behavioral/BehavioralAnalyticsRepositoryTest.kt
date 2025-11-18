@@ -13,7 +13,7 @@ import io.mockk.coEvery
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -31,7 +31,7 @@ class BehavioralAnalyticsRepositoryTest {
     private val repository = BehavioralAnalyticsRepositoryImpl(dataSource, mapper)
 
     @Test
-    fun `saveEvent maps domain and delegates to dataSource`() = runBlocking {
+    fun `saveEvent maps domain and delegates to dataSource`() = runTest {
         val instant = Instant.fromEpochMilliseconds(1234L)
         val domain = KeystrokeEvent(
             eventTime = instant,
@@ -56,7 +56,7 @@ class BehavioralAnalyticsRepositoryTest {
     }
 
     @Test
-    fun `observeLatestEvent maps entity emissions to domain`() = runBlocking {
+    fun `observeLatestEvent maps entity emissions to domain`() = runTest {
         val flow = MutableStateFlow<KeystrokeEventEntity?>(null)
         every { dataSource.observeLatestKeystrokeEventEntity() } returns flow
 
@@ -90,7 +90,7 @@ class BehavioralAnalyticsRepositoryTest {
     }
 
     @Test
-    fun `deleteAllEvents delegates to dataSource`() = runBlocking {
+    fun `deleteAllEvents delegates to dataSource`() = runTest {
         coEvery { dataSource.deleteAllKeystrokeEventEntities() } returns Unit
 
         repository.deleteAllEvents()

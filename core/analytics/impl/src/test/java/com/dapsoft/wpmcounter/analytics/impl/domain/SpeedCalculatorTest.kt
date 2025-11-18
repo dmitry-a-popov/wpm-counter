@@ -24,6 +24,7 @@ class SpeedCalculatorTest {
     fun `negative words count throws`() {
         val logger: Logger = mockk(relaxed = true)
         val calculator = SpeedCalculatorImpl(logger)
+
         assertThrows(IllegalArgumentException::class.java) {
             calculator.calculateWordsPerMinute(-1, 1.minutes)
         }
@@ -34,6 +35,7 @@ class SpeedCalculatorTest {
     fun `negative active time throws`() {
         val logger: Logger = mockk(relaxed = true)
         val calculator = SpeedCalculatorImpl(logger)
+
         assertThrows(IllegalArgumentException::class.java) {
             calculator.calculateWordsPerMinute(1, (-1).seconds)
         }
@@ -46,8 +48,9 @@ class SpeedCalculatorTest {
         val calculator = SpeedCalculatorImpl(logger)
         val tag = SpeedCalculatorImpl::class.java.simpleName
         val wpm = calculator.calculateWordsPerMinute(0, 2.minutes)
+
         assertEquals(0f, wpm, delta)
-        verify(exactly = 1) { logger.log(LogLevel.DEBUG, tag, null, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.DEBUG), tag, null, any()) }
     }
 
     @Test
@@ -56,8 +59,9 @@ class SpeedCalculatorTest {
         val calculator = SpeedCalculatorImpl(logger)
         val tag = SpeedCalculatorImpl::class.java.simpleName
         val wpm = calculator.calculateWordsPerMinute(5, Duration.ZERO)
+
         assertEquals(0f, wpm, delta)
-        verify(exactly = 1) { logger.log(LogLevel.DEBUG, tag, null, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.DEBUG), tag, null, any()) }
     }
 
     @Test
@@ -66,8 +70,9 @@ class SpeedCalculatorTest {
         val calculator = SpeedCalculatorImpl(logger)
         val tag = SpeedCalculatorImpl::class.java.simpleName
         val wpm = calculator.calculateWordsPerMinute(3, 59.milliseconds)
+
         assertEquals(0f, wpm, delta)
-        verify(exactly = 1) { logger.log(LogLevel.DEBUG, tag, null, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.DEBUG), eq(tag), null, any()) }
     }
 
     @Test
@@ -78,8 +83,9 @@ class SpeedCalculatorTest {
         val active = 61.milliseconds
         val expected = 2f / (active.inWholeMilliseconds.toFloat() / 1.minutes.inWholeMilliseconds.toFloat())
         val wpm = calculator.calculateWordsPerMinute(2, active)
+
         assertEquals(expected, wpm, delta)
-        verify(exactly = 1) { logger.log(LogLevel.DEBUG, tag, null, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.DEBUG), eq(tag), null, any()) }
     }
 
     @Test
@@ -88,8 +94,9 @@ class SpeedCalculatorTest {
         val calculator = SpeedCalculatorImpl(logger)
         val tag = SpeedCalculatorImpl::class.java.simpleName
         val wpm = calculator.calculateWordsPerMinute(5, 2.minutes)
+
         assertEquals(2.5f, wpm, delta)
-        verify(exactly = 1) { logger.log(LogLevel.DEBUG, tag, null, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.DEBUG), eq(tag), null, any()) }
     }
 
     @Test
@@ -98,8 +105,9 @@ class SpeedCalculatorTest {
         val calculator = SpeedCalculatorImpl(logger)
         val tag = SpeedCalculatorImpl::class.java.simpleName
         val wpm = calculator.calculateWordsPerMinute(120, 1.minutes)
+
         assertEquals(120f, wpm, delta)
-        verify(exactly = 1) { logger.log(LogLevel.DEBUG, tag, null, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.DEBUG), eq(tag), null, any()) }
     }
 
     @Test
@@ -110,7 +118,8 @@ class SpeedCalculatorTest {
         calculator.calculateWordsPerMinute(1, 1.minutes)
         calculator.calculateWordsPerMinute(2, 2.minutes)
         calculator.calculateWordsPerMinute(0, 5.minutes)
-        verify(exactly = 3) { logger.log(LogLevel.DEBUG, tag, null, any()) }
+
+        verify(exactly = 3) { logger.log(eq(LogLevel.DEBUG), eq(tag), null, any()) }
     }
 
     @Test
@@ -120,7 +129,9 @@ class SpeedCalculatorTest {
         val tag = SpeedCalculatorImpl::class.java.simpleName
         val captured = slot<() -> String>()
         calculator.calculateWordsPerMinute(10, 5.minutes)
-        verify { logger.log(LogLevel.DEBUG, tag, null, capture(captured)) }
+
+        verify { logger.log(eq(LogLevel.DEBUG), eq(tag), null, capture(captured)) }
+
         val message = captured.captured.invoke()
         assert(message.contains("result=2.0"))
     }

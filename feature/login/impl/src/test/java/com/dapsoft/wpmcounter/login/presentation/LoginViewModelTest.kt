@@ -30,6 +30,8 @@ class LoginViewModelTest {
 
     private lateinit var viewModel: LoginViewModel
 
+    private val tag = LoginViewModel::class.java.simpleName
+
     @Before
     fun setUp() {
         saveUserNameUseCase = mockk(relaxed = true)
@@ -119,7 +121,7 @@ class LoginViewModelTest {
         verify(exactly = 1) {
             logger.log(
                 eq(LogLevel.DEBUG),
-                eq(LoginViewModel.TAG),
+                eq(tag),
                 isNull(),
                 match<() -> String> { lambda ->
                     lambda().contains("$loginConfirmedIntent")
@@ -136,7 +138,7 @@ class LoginViewModelTest {
         verify(exactly = 1) {
             logger.log(
                 eq(LogLevel.DEBUG),
-                eq(LoginViewModel.TAG),
+                eq(tag),
                 isNull(),
                 match<() -> String> { lambda ->
                     lambda().contains("$intent")

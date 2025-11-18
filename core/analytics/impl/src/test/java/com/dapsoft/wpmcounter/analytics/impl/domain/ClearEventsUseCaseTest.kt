@@ -10,7 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
@@ -32,7 +32,7 @@ class ClearEventsUseCaseTest {
     private val tag = ClearEventsUseCaseImpl::class.java.simpleName
 
     @Test
-    fun `invoke success deletes events resets state and returns success`() = runBlocking {
+    fun `invoke success deletes events resets state and returns success`() = runTest {
         coEvery { repository.deleteAllEvents() } returns Unit
         every { stateStore.reset() } returns Unit
 
@@ -45,7 +45,7 @@ class ClearEventsUseCaseTest {
     }
 
     @Test
-    fun `invoke repository failure returns failure does not reset state logs error`() = runBlocking {
+    fun `invoke repository failure returns failure does not reset state logs error`() = runTest {
         val exception = IllegalStateException("fail")
         coEvery { repository.deleteAllEvents() } throws exception
 
@@ -55,11 +55,11 @@ class ClearEventsUseCaseTest {
         assertEquals(exception, result.exceptionOrNull())
         coVerify(exactly = 1) { repository.deleteAllEvents() }
         verify(exactly = 0) { stateStore.reset() }
-        verify(exactly = 1) { logger.log(LogLevel.ERROR, tag, exception, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.ERROR), eq(tag), eq(exception), any()) }
     }
 
     @Test
-    fun `invoke cancellation rethrows does not reset state logs error`() = runBlocking {
+    fun `invoke cancellation rethrows does not reset state logs error`() = runTest {
         val exception = CancellationException("cancel")
         coEvery { repository.deleteAllEvents() } throws exception
 
@@ -73,11 +73,11 @@ class ClearEventsUseCaseTest {
         assertEquals(exception, thrown)
         coVerify(exactly = 1) { repository.deleteAllEvents() }
         verify(exactly = 0) { stateStore.reset() }
-        verify(exactly = 1) { logger.log(LogLevel.ERROR, tag, exception, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.ERROR), eq(tag), eq(exception), any()) }
     }
 
     @Test
-    fun `invoke reset failure returns failure logs error after successful delete`() = runBlocking {
+    fun `invoke reset failure returns failure logs error after successful delete`() = runTest {
         coEvery { repository.deleteAllEvents() } returns Unit
         val resetException = RuntimeException("reset fail")
         every { stateStore.reset() } throws resetException
@@ -88,11 +88,11 @@ class ClearEventsUseCaseTest {
         assertEquals(resetException, result.exceptionOrNull())
         coVerify(exactly = 1) { repository.deleteAllEvents() }
         verify(exactly = 1) { stateStore.reset() }
-        verify(exactly = 1) { logger.log(LogLevel.ERROR, tag, resetException, any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.ERROR), eq(tag), eq(resetException), any()) }
     }
 
     @Test
-    fun `invoke success does not log error`() = runBlocking {
+    fun `invoke success does not log error`() = runTest {
         coEvery { repository.deleteAllEvents() } returns Unit
         every { stateStore.reset() } returns Unit
 
@@ -102,7 +102,7 @@ class ClearEventsUseCaseTest {
     }
 
     @Test
-    fun `invoke failure does not swallow exception types`() = runBlocking {
+    fun `invoke failure does not swallow exception types`() = runTest {
         val exception = UnsupportedOperationException("uoe")
         coEvery { repository.deleteAllEvents() } throws exception
 

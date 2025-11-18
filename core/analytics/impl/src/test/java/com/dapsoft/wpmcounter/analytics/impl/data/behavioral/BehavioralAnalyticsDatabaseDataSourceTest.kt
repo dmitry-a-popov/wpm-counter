@@ -12,7 +12,7 @@ import io.mockk.coEvery
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -27,7 +27,7 @@ class BehavioralAnalyticsDatabaseDataSourceTest {
     private val dataSource = BehavioralAnalyticsDatabaseDataSource(database)
 
     @Test
-    fun `saveKeystrokeEventEntity delegates insert to dao`() = runBlocking {
+    fun `saveKeystrokeEventEntity delegates insert to dao`() = runTest {
         val entity = KeystrokeEventEntity(
             id = 0L,
             eventTimeMillis = 123L,
@@ -42,7 +42,7 @@ class BehavioralAnalyticsDatabaseDataSourceTest {
     }
 
     @Test
-    fun `observeLatestKeystrokeEventEntity returns flow from dao`() = runBlocking {
+    fun `observeLatestKeystrokeEventEntity returns flow from dao`() = runTest {
         val flow = MutableStateFlow<KeystrokeEventEntity?>(null)
         every { dao.observeLatestEvent() } returns flow
 
@@ -62,7 +62,7 @@ class BehavioralAnalyticsDatabaseDataSourceTest {
     }
 
     @Test
-    fun `deleteAllKeystrokeEventEntities delegates to dao`() = runBlocking {
+    fun `deleteAllKeystrokeEventEntities delegates to dao`() = runTest {
         coEvery { dao.deleteAllEvents() } returns Unit
 
         dataSource.deleteAllKeystrokeEventEntities()

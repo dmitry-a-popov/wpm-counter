@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 
 import org.junit.Assert.assertEquals
@@ -44,7 +45,7 @@ class ObserveTypingSpeedUseCaseTest {
     private val useCase = ObserveTypingSpeedUseCaseImpl(analyticsRepo, speedCalculator, sessionUpdater, textValidator, logger)
 
     @Test
-    fun `flow emits Active then Paused for single event`() = runBlocking {
+    fun `flow emits Active then Paused for single event`() = runTest {
         val pause = 40.milliseconds
         val eventTime = Instant.fromEpochMilliseconds(1_000L)
         val event = KeystrokeEvent(eventTime, 'a', ScreenOrientation.PORTRAIT, "u")
@@ -70,7 +71,7 @@ class ObserveTypingSpeedUseCaseTest {
     }
 
     @Test
-    fun `distinctUntilChanged filters identical consecutive Active states`() = runBlocking {
+    fun `distinctUntilChanged filters identical consecutive Active states`() = runTest {
         val pause = 80.milliseconds
         val upstream = MutableSharedFlow<KeystrokeEvent?>(replay = 1)
         every { analyticsRepo.observeLatestEvent() } returns upstream
@@ -89,12 +90,13 @@ class ObserveTypingSpeedUseCaseTest {
     }
 
     @Test
-    fun `flow emits Error after non cancellation exception and continues`() = runBlocking {
+    fun `flow emits Error after non cancellation exception and continues`() = runTest {
         val pause = 50.milliseconds
+        val exception = RuntimeException("boom")
         every { analyticsRepo.observeLatestEvent() } returns flow {
             val t = Instant.fromEpochMilliseconds(1)
             emit(KeystrokeEvent(t, 'a', ScreenOrientation.PORTRAIT, "u"))
-            throw RuntimeException("boom")
+            throw exception
         }
         every { sessionUpdater.updateForKeystroke('a', any(), pause) } returns SessionState(
             lastEventTimestamp = Instant.fromEpochMilliseconds(1),
@@ -110,13 +112,13 @@ class ObserveTypingSpeedUseCaseTest {
         assertTrue(states[0] is TypingSpeedState.Active)
         assertEquals(30f, (states[0] as TypingSpeedState.Active).wordsPerMinute)
         assertEquals(TypingSpeedState.Error, states[1])
-        verify { logger.log(LogLevel.ERROR, any(), any(), any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.ERROR), any(), match { it.message == exception.message }, any()) }
     }
 
     @Test
-    fun `flow rethrows cancellation exception`() = runBlocking {
+    fun `flow rethrows cancellation exception`() = runTest {
         val pause = 30.milliseconds
-        every { analyticsRepo.observeLatestEvent() } returns flow<KeystrokeEvent?> {
+        every { analyticsRepo.observeLatestEvent() } returns flow {
             throw CancellationException("cancel")
         }
 
@@ -134,7 +136,7 @@ class ObserveTypingSpeedUseCaseTest {
     }
 
     @Test
-    fun `active speed calculation uses validator matches count`() = runBlocking {
+    fun `active speed calculation uses validator matches count`() = runTest {
         val pause = 40.milliseconds
         val upstream = MutableSharedFlow<KeystrokeEvent?>(replay = 1)
         every { analyticsRepo.observeLatestEvent() } returns upstream

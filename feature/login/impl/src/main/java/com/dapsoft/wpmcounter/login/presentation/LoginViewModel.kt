@@ -1,7 +1,5 @@
 package com.dapsoft.wpmcounter.login.presentation
 
-import androidx.annotation.VisibleForTesting
-
 import com.dapsoft.wpmcounter.logger.Logger
 import com.dapsoft.wpmcounter.logger.d
 import com.dapsoft.wpmcounter.ui_common.BaseMviViewModel
@@ -48,7 +46,6 @@ internal class LoginViewModel @Inject constructor(
     }
 
     companion object {
-        @VisibleForTesting
-        val TAG: String = LoginViewModel::class.java.simpleName
+        private val TAG: String = LoginViewModel::class.java.simpleName
     }
 }

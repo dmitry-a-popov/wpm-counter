@@ -15,6 +15,7 @@ import io.mockk.slot
 import io.mockk.verify
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -39,7 +40,7 @@ class TrackKeyPressUseCaseTest {
     private val tag = TrackKeyPressUseCaseImpl::class.java.simpleName
 
     @Test
-    fun `successful invoke saves event with correct fields`() = runBlocking {
+    fun `successful invoke saves event with correct fields`() = runTest {
         val now = Instant.fromEpochMilliseconds(1_234L)
         every { timeProvider.now() } returns now
         every { orientationProvider.currentOrientation } returns ScreenOrientation.LANDSCAPE
@@ -58,7 +59,7 @@ class TrackKeyPressUseCaseTest {
     }
 
     @Test
-    fun `blank userName returns failure does not save event logs error`() = runBlocking {
+    fun `blank userName returns failure does not save event logs error`() = runTest {
         every { timeProvider.now() } returns Instant.fromEpochMilliseconds(10)
         every { orientationProvider.currentOrientation } returns ScreenOrientation.PORTRAIT
 
@@ -66,11 +67,11 @@ class TrackKeyPressUseCaseTest {
 
         assertTrue(result.isFailure)
         coVerify(exactly = 0) { repository.saveEvent(any()) }
-        verify { logger.log(LogLevel.ERROR, tag, any(), any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.ERROR), eq(tag), any(), any()) }
     }
 
     @Test
-    fun `repository failure returns failure logs error`() = runBlocking {
+    fun `repository failure returns failure logs error`() = runTest {
         val now = Instant.fromEpochMilliseconds(99)
         every { timeProvider.now() } returns now
         every { orientationProvider.currentOrientation } returns ScreenOrientation.PORTRAIT
@@ -81,11 +82,11 @@ class TrackKeyPressUseCaseTest {
 
         assertTrue(result.isFailure)
         assertEquals(ex, result.exceptionOrNull())
-        verify { logger.log(LogLevel.ERROR, tag, ex, any()) }
+        verify(exactly = 1) { logger.log(LogLevel.ERROR, eq(tag), eq(ex), any()) }
     }
 
     @Test
-    fun `cancellation rethrows`() = runBlocking {
+    fun `cancellation rethrows`() = runTest {
         val now = Instant.fromEpochMilliseconds(5)
         every { timeProvider.now() } returns now
         every { orientationProvider.currentOrientation } returns ScreenOrientation.UNDEFINED
@@ -94,11 +95,11 @@ class TrackKeyPressUseCaseTest {
         assertThrows(CancellationException::class.java) {
             runBlocking { useCase.invoke('z', "user") }
         }
-        verify { logger.log(LogLevel.ERROR, tag, any(), any()) }
+        verify(exactly = 1) { logger.log(eq(LogLevel.ERROR), eq(tag), any(), any()) }
     }
 
     @Test
-    fun `failure path does not swallow exception type`() = runBlocking {
+    fun `failure path does not swallow exception type`() = runTest {
         val now = Instant.fromEpochMilliseconds(7)
         every { timeProvider.now() } returns now
         every { orientationProvider.currentOrientation } returns ScreenOrientation.PORTRAIT

@@ -10,7 +10,7 @@ import io.mockk.verify
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -23,7 +23,7 @@ class UserRepositoryTest {
     private val repository: UserRepository = UserRepositoryImpl(userDataStoreDataSource)
 
     @Test
-    fun `observeUserName delegates to dataSource and returns flow`() = runBlocking {
+    fun `observeUserName delegates to dataSource and returns flow`() = runTest {
         val flow = MutableStateFlow<String?>(null)
         every { userDataStoreDataSource.observeUserName() } returns flow
 
@@ -38,7 +38,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun `saveUserName delegates to dataSource`() = runBlocking {
+    fun `saveUserName delegates to dataSource`() = runTest {
         coEvery { userDataStoreDataSource.saveUserName("testName") } returns Unit
 
         repository.saveUserName("testName")
@@ -47,7 +47,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun `clearUserName delegates to dataSource`() = runBlocking {
+    fun `clearUserName delegates to dataSource`() = runTest {
         coEvery { userDataStoreDataSource.clearUserName() } returns Unit
 
         repository.clearUserName()
