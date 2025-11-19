@@ -94,7 +94,7 @@ Implements the Login feature UI and presentation layer. Contains:
 ## Dependencies on Other Modules
 - :feature:login:api
 - :core:logger:api
-- :core:ui-common
+- :core:mvi
 - :core:user:api
 
 # Module: feature:typing:api
@@ -117,7 +117,7 @@ Implements Typing feature domain + UI:
 - :core:analytics:api
 - :core:common:api
 - :core:logger:api
-- :core:ui-common
+- :core:mvi
 - :core:user:api
 
 ---
@@ -165,9 +165,9 @@ Provides logging implementation (`LoggerImpl`) and DI module (`LoggerModule`).
 ## Dependencies on Other Modules
 - :core:logger:api
 
-# Module: core:ui-common
+# Module: core:mvi
 ## Purpose
-Common UI/architecture utilities: base MVI ViewModel abstraction (`BaseMviViewModel`).
+Lightweight MVI architecture pattern implementation: base MVI ViewModel abstraction (`BaseMviViewModel`).
 ## Dependencies on Other Modules
 (None)
 
