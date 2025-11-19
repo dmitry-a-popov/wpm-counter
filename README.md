@@ -23,21 +23,24 @@ The codebase is organized into three layers:
 
 Within features, presentation uses a lightweight MVI approach (`UiState`, `UiIntent`, one-time events, base ViewModel support).
 
-## 2025 Technology Stack (All Present in Source)
-- Kotlin (JVM target 17)
-- Jetpack Compose UI (Material 3, previews, BOM)
+## 2025 Technology Stack
+- Kotlin
+- Coroutines & Flow
+- Jetpack Compose UI (Material 3)
 - Navigation Compose
-- Hilt for Dependency Injection (with KSP-based code generation)
-- Room (behavioral analytics persistence; schema location configured via KSP arg)
-- AndroidX DataStore (user name storage)
-- Modular multi-module Gradle setup (API/impl split, version catalogs via `libs.versions.toml`)
-- MVI-style state management helpers (custom `BaseMviViewModel`, one-time event flow)
+- Hilt for Dependency Injection
+- Modular multi-module Gradle setup
+- Dependency inversion via API modules (public contracts) and impl modules (internal logic)
+- Clean architecture
+- MVI pattern for UI state management
+- SOLID principles
+- Unit-tests 100% coverage of business logic and view models
+- JUnit & MockK & Turbine for testing
+- Room
 - Android SDK: compileSdk = 36, targetSdk = 36, minSdk = 24
 - Kotlin KSP (Hilt & Room processors)
-- AndroidX Core KTX, Lifecycle Runtime, Activity Compose
-- Logging abstraction (`Logger` + implementation)
-- Word / text validation and screen orientation abstractions
-- Dependency inversion via API modules (public contracts) and impl modules (internal logic)
+- AndroidX DataStore
+- Version catalogs via `libs.versions.toml`
 
 ## DI & Modularity
 - Hilt entry point: `WpmCounterApplication`
