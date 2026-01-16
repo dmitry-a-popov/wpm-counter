@@ -5,7 +5,7 @@ An Android application that measures a user's typing speed (Words Per Minute) in
 - Error highlighting
 - Final performance summary
 
-This project serves as a practical example of applying a modern (2025) Android technology stack and modular architecture in a production-style scenario.
+This project serves as a practical example of applying a modern (2026) Android technology stack and modular architecture in a production-style scenario.
 
 ## Key Features
 - Real-time WPM calculation based on keystroke analytics
@@ -23,7 +23,7 @@ The codebase is organized into three layers:
 
 Within features, presentation uses a lightweight MVI approach (`UiState`, `UiIntent`, one-time events, base ViewModel support).
 
-## 2025 Technology Stack
+## 2026 Technology Stack
 - Kotlin
 - Coroutines & Flow
 - Jetpack Compose UI (Material 3)
