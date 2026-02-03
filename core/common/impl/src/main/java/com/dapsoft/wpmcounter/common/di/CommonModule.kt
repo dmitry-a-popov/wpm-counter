@@ -1,8 +1,6 @@
 package com.dapsoft.wpmcounter.common.di
 
-import android.content.Context
-
-import com.dapsoft.wpmcounter.common.ScreenOrientationProviderImpl
+import com.dapsoft.wpmcounter.common.orientation.ScreenOrientationProviderImpl
 import com.dapsoft.wpmcounter.common.SystemTimeProvider
 import com.dapsoft.wpmcounter.common.TimeProvider
 import com.dapsoft.wpmcounter.common.WordCounter
@@ -13,9 +11,7 @@ import com.dapsoft.wpmcounter.common.validation.TextValidatorImpl
 
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module
